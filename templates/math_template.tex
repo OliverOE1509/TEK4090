@@ -1,0 +1,95 @@
+\documentclass[11pt, a4paper]{article} % Consider 'amsart' for publishing
+
+% ===== ESSENTIAL PACKAGES =====
+\usepackage{amsmath, amssymb, amsthm} % AMS mathematical facilities
+\usepackage{mathtools} % For advanced math formatting (e.g., cases)
+\usepackage{geometry} % For adjustable margins
+\geometry{a4paper, margin=1in} % Set margins to 1 inch
+
+% ===== CUSTOM THEOREM ENVIRONMENTS =====
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% ===== SHORTCUT COMMANDS =====
+% Common sets (mathbb)
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+\newcommand{\Z}{\mathbb{Z}} % Integers
+\newcommand{\C}{\mathbb{C}} % Complex numbers
+\newcommand{\Q}{\mathbb{Q}} % Rational numbers
+
+% Common operators (mathrm)
+\newcommand{\diff}{\mathop{}\!\mathrm{d}} % For integrals: dx -> \diff x
+\DeclareMathOperator{\arcsec}{arcsec} % Declare operators that aren't predefined
+
+% ===== DOCUMENT BEGIN =====
+\title{Title of Your Mathematical Work}
+\author{Your Name}
+\date{\today} % You can remove this for a fixed date or leave blank
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+    A concise summary of your paper's purpose and main results.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+This is where you introduce the problem. You can cite equations like \eqref{eq:favorite} or theorems like \ref{thm:main}.
+
+\section{Main Results}
+\label{sec:main_results}
+
+\begin{definition}
+    A function \( f: \R \to \R \) is called \emph{interesting} if it satisfies the following condition:
+    \[
+        \int_{-\infty}^{\infty} |f(x)|^2 \diff x < \infty.
+    \]
+\end{definition}
+
+\begin{theorem}[Main Theorem]
+\label{thm:main}
+    Every interesting function \( f \) is continuous almost everywhere.
+\end{theorem}
+
+\begin{proof}
+    The proof involves a standard argument using the density of continuous functions in \( L^2(\R) \). Let \( \epsilon > 0 \). Since \( f \in L^2(\R) \), there exists...
+    \[
+        \lim_{n \to \infty} \left( \sum_{k=1}^{n} \frac{1}{k^2} \right) = \frac{\pi^2}{6}.
+    \]
+    \qedhere % Use this to place the QED symbol correctly inside displayed math
+\end{proof}
+
+You can also use aligned equations:
+\begin{equation}
+\label{eq:favorite}
+    \begin{aligned}
+        e^{i\pi} + 1 &= 0, \\
+        \frac{\diff}{\diff t} \left( \frac{\partial L}{\partial \dot{q}_k} \right) - \frac{\partial L}{\partial q_k} &= 0.
+    \end{aligned}
+\end{equation}
+
+Or a case structure:
+\[
+    f(x) = \begin{dcases}
+        \frac{\sin(x)}{x} & \text{if } x \neq 0, \\
+        1                 & \text{if } x = 0.
+    \end{dcases}
+\]
+
+\section*{Acknowledgements} % The asterisk (*) removes section numbering
+Optional acknowledgements.
+
+% ===== BIBLIOGRAPHY =====
+% Uncomment the lines below if you have references
+% \bibliographystyle{plain}
+% \bibliography{references}
+
+\end{document}

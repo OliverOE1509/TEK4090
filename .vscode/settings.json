@@ -1,0 +1,65 @@
+{
+  // ===== LaTeX-Workshop Specific Settings =====
+  "latex-workshop.latex.autoBuild.run": "onSave", // Build automatically when you save the .tex file
+  "latex-workshop.latex.autoClean.run": "onFailed", // Clean up temporary files after a failed build
+  "latex-workshop.latex.recipe.default": "lastUsed", // Remember the last compilation recipe you used
+  "latex-workshop.latex.outDir": "./out", // Put all build artifacts in a dedicated './out' folder
+  "latex-workshop.view.pdf.viewer": "tab", // Open the PDF in a tab right inside VS Code
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-pdf",
+        "-outdir=%OUTDIR%",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "pdflatex",
+      "command": "pdflatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk",
+      "tools": ["latexmk"]
+    },
+    {
+      "name": "pdflatex ➞ bibtex ➞ pdflatex ➞ pdflatex",
+      "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]
+    }
+  ],
+
+  // ===== General Quality of Life Settings =====
+  "files.eol": "\n", // Use UNIX line endings (important for cross-OS compatibility with Git)
+  "editor.wordWrap": "on", // Nice for writing prose in text blocks
+  "editor.rulers": [80], // Add a ruler at 80 characters for line length
+  "files.exclude": { // Hide clutter from your file explorer
+    "**/*.aux": true,
+    "**/*.bbl": true,
+    "**/*.blg": true,
+    "**/*.fdb_latexmk": true,
+    "**/*.fls": true,
+    "**/*.log": true,
+    "**/*.out": true,
+    "**/*.toc": true,
+    "**/*.synctex.gz": true,
+    "**/out": true // This hides the output directory if you use the outDir setting
+  },
+  "search.exclude": { // Also exclude these files from searches
+    "**/out": true,
+    "**/*.aux": true,
+    "**/*.log": true,
+    // ... other build files
+  },
+}

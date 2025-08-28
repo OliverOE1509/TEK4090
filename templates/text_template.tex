@@ -1,0 +1,79 @@
+\documentclass[11pt, a4paper]{article}
+
+% ===== ESSENTIAL PACKAGES FOR PHILOSOPHY =====
+\usepackage[english]{babel} % For hyphenation and linguistic rules
+\usepackage{geometry} % For comfortable margins for reading
+\geometry{a4paper, margin=1.2in} % Slightly larger margins for notes
+\usepackage{setspace} % For line spacing
+\onehalfspacing % 1.5 line spacing for readability
+
+\usepackage[style=apa, backend=biber]{biblatex} % For APA-style citations (great for philosophy)
+\addbibresource{references.bib} % Your BibTeX file
+
+% ===== PACKAGES FOR LOGIC & ARGUMENT STRUCTURE =====
+\usepackage{logicproof} % For formal logic proofs (optional)
+\usepackage{enumitem} % For customizing lists
+
+% ===== CUSTOM ENVIRONMENTS FOR PHILOSOPHICAL ARGUMENTS =====
+\newenvironment{argument}{\begin{quote}\itshape}{\end{quote}} % For quoting arguments
+\newenvironment{objection}{\begin{quote}\itshape\textbf{Objection: }}{\end{quote}} % For objections
+\newenvironment{reply}{\begin{quote}\itshape\textbf{Reply: }}{\end{quote}} % For replies
+
+% ===== DOCUMENT BEGIN =====
+\title{Title of Your Philosophical Essay}
+\author{Your Name}
+\date{}
+
+\begin{document}
+\maketitle
+
+% No abstract is typical for shorter philosophy essays
+
+\section{Introduction}
+\label{sec:introduction}
+
+Begin by stating your topic and thesis clearly. For example: \textit{In this paper, I will argue that knowledge is not justified true belief.} It is also standard to outline the structure of your paper: \textit{First, I will present Gettier's original counterexamples. Second, I will... Finally, I will conclude that...}
+
+\section{Exposition and Argument}
+\label{sec:argument}
+
+Always fairly explain the view you are engaging with before critiquing it.
+
+\begin{argument}
+    This is a block quote or a reconstruction of another philosopher's argument. You can use this environment to set it apart visually from your own prose. For example, you might summarize Descartes' Cogito argument here.
+\end{argument}
+
+You can number premises of an argument clearly using the \texttt{enumerate} environment:
+\begin{enumerate}[label=(\arabic*)] % This creates (1), (2) style numbering
+    \item \label{premise:1} All men are mortal.
+    \item \label{premise:2} Socrates is a man.
+    \item[\therefore] \label{conclusion} Socrates is mortal. % \therefore gives the therefore symbol
+\end{enumerate}
+
+As you can see from premises \ref{premise:1} and \ref{premise:2}, the conclusion \ref{conclusion} follows necessarily.
+
+\section{Critical Discussion}
+\label{sec:critical}
+
+This is where you present your original contribution—your critique, analysis, or positive view.
+
+\begin{objection}
+    However, one might object that the first premise is false. What if genetic engineering allows some humans to become immortal? This would undermine the entire argument.
+\end{objection}
+
+\begin{reply}
+    In reply to this objection, we can modify the first premise to be \textit{All biologically natural men are mortal}. This accommodates the objector's point without surrendering the argument's validity.
+\end{reply}
+
+You can also use footnotes for tangential but interesting points.\footnote{This is a great place to mention an interesting aside, a further reference, or a complicating point that would break the flow of the main argument.}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Briefly summarize the path your paper has taken and restate your conclusion. Avoid introducing new arguments or evidence here.
+
+% ===== BIBLIOGRAPHY =====
+% Print the bibliography
+\printbibliography
+
+\end{document}

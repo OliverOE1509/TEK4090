@@ -1,0 +1,61 @@
+{
+  "Placeholder Snippet": {
+    "prefix": "desc",
+    "body": [
+      "\\begin{description}",
+      "\t\\item[$1] $0",
+      "\\end{description}"
+    ],
+    "description": "Create a description environment"
+  },
+  "Figure Environment": {
+    "prefix": "fig",
+    "body": [
+      "\\begin{figure}[ht]",
+      "\t\\centering",
+      "\t\\includegraphics[width=0.8\\linewidth]{$1}",
+      "\t\\caption{${2:Caption}}",
+      "\t\\label{fig:${3:label}}",
+      "\\end{figure}"
+    ],
+    "description": "Insert a figure environment"
+  },
+  "Equation Environment": {
+    "prefix": "eq",
+    "body": [
+      "\\begin{equation}",
+      "\t$0",
+      "\\end{equation}"
+    ],
+    "description": "Insert an equation environment"
+  },
+  "Inline Math": {
+    "prefix": "mm",
+    "body": ["\\( $1 \\)"],
+    "description": "Inline math mode \\( ... \\)"
+  },
+  "Display Math": {
+    "prefix": "dm",
+    "body": ["\\[ $0 \\]"],
+    "description": "Display math mode \\[ ... \\]"
+  },
+  "Bold and Italic": {
+    "prefix": "bi",
+    "body": ["\\textbf{\\textit{$1}}$0"],
+    "description": "Bold and italic text"
+  },
+  "Section": {
+    "prefix": "sec",
+    "body": ["\\section{${1:Section Name}}", "$0"],
+    "description": "Create a new section"
+  },
+  "Unordered List": {
+    "prefix": "itemize",
+    "body": [
+      "\\begin{itemize}",
+      "\t\\item $0",
+      "\\end{itemize}"
+    ],
+    "description": "Create an itemize environment"
+  }
+}
