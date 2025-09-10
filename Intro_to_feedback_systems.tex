@@ -1,0 +1,65 @@
+\documentclass[11pt, a4paper]{article} % Consider 'amsart' for publishing
+
+% ===== ESSENTIAL PACKAGES =====
+\usepackage{amsmath, amssymb, amsthm} % AMS mathematical facilities
+\usepackage{mathtools} % For advanced math formatting (e.g., cases)
+\usepackage{geometry} % For adjustable margins
+\geometry{a4paper, margin=1in} % Set margins to 1 inch
+
+% ===== CUSTOM THEOREM ENVIRONMENTS =====
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% ===== SHORTCUT COMMANDS =====
+% Common sets (mathbb)
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+\newcommand{\Z}{\mathbb{Z}} % Integers
+\newcommand{\C}{\mathbb{C}} % Complex numbers
+\newcommand{\Q}{\mathbb{Q}} % Rational numbers
+
+% Common operators (mathrm)
+\newcommand{\diff}{\mathop{}\!\mathrm{d}} % For integrals: dx -> \diff x
+\DeclareMathOperator{\arcsec}{arcsec} % Declare operators that aren't predefined
+
+% ===== DOCUMENT BEGIN =====
+\title{Feedback Systems}
+\author{Oliver Ekeberg}
+\date{\today} % You can remove this for a fixed date or leave blank
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+    A note on the book Feedback Systems
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Basic feedback loop: Sensing, computing and acting
+
+In genereal, the feedback system will have some inputs, states and outputs. Illustrated by
+
+\begin{enumerate}
+    \item Input : $u(t) $
+    \item states : $x(t)$
+    \item outputs: $y(t)$
+\end{enumerate}
+
+
+
+
+
+
+% ===== BIBLIOGRAPHY =====
+% Uncomment the lines below if you have references
+% \bibliographystyle{plain}
+% \bibliography{references}
+
+\end{document}
