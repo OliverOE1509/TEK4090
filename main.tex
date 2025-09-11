@@ -1,12 +1,45 @@
 \documentclass[11pt]{article}
-\title{Your Title Here}
-\author{Your Name}
+\title{TEK4090}
+\author{Oliver Ekeberg}
 \date{\today}
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
-Start writing here!
+
+
+
+\section{Nyquist stability criterion}
+
+Nyquist stability criterion determines the stability of a closed loop system based on the Nyquist plot. It states that the stability depends on the number of encirclements of the critical point (-1,0) in the Nyquist plot of the open loop transfer function.
+
+
+\textbf{\textit{A closed loop system is a system where the outout is compared to a desired refernce output, then the difference becomes an input to the system. An open loop system is a system where the output is not fed back to the input.}}
+
+
+
+
+
+A closed loop system is stable if the number of encirclements of $ -1 + 0i = N$ in the Nyquist plot is  \[
+N = P - Z
+\] 
+
+where
+
+\begin{itemize}
+    \item \textbf{\textit{P}}: Open loop poles in the right half plane (RHP)
+    \item \textbf{\textit{Z}}: Number of closed-loop poles in the RHP
+\end{itemize}
+
+
+\subsection{Applications of Nyquist plot}
+
+\begin{enumerate}
+    \item Analysis of closed loop stability
+    \item Evaluating \textbf{\textit{stability margins}} and \textbf{\textit{phase margins}}
+    \item Designing PID controllers and compensators in control systems
+\end{enumerate}
+
 
 \end{document}
