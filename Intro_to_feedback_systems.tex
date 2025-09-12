@@ -4,6 +4,7 @@
 \usepackage{amsmath, amssymb, amsthm} % AMS mathematical facilities
 \usepackage{mathtools} % For advanced math formatting (e.g., cases)
 \usepackage{geometry} % For adjustable margins
+\usepackage{graphicx}
 \geometry{a4paper, margin=1in} % Set margins to 1 inch
 
 % ===== CUSTOM THEOREM ENVIRONMENTS =====
@@ -55,7 +56,40 @@ In genereal, the feedback system will have some inputs, states and outputs. Illu
 
 
 
-\section{Nyquist stability criterion}
+\section{Feedback loop and stability}
+
+Before we get to the Nyquist stability criterion, we need to establish the motivation behind exploring stability. Good performance needs high-gain controllers. Yet, the feedback loop will become unstable if the gain is too high. This is where the Nyquist criterion comes in, it allows us to analyze stability. 
+
+Nyquist criterion involves 
+
+
+\begin{itemize}
+    \item open-loop frequency response function
+    \item magnitude
+    \item phase
+\end{itemize}
+
+
+Two approaches
+
+\begin{enumerate}
+    \item Classical approach in the frequency domain : Single input, single output (SISO)
+    \item state-space models : multiple inputs, multiple outputs (MIMO)
+\end{enumerate}
+
+
+
+\subsection{Standard feedback loop}
+
+\includegraphics{Standard feedback loop.png}
+
+
+\subsubsection{closed loop transfer functions}
+
+
+
+
+
 
 Nyquist stability criterion determines the stability of a closed loop system based on the Nyquist plot. It states that the stability depends on the number of encirclements of the critical point (-1,0) in the Nyquist plot of the open loop transfer function.
 
