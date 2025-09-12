@@ -4,6 +4,7 @@
 \usepackage{amsmath, amssymb, amsthm} % AMS mathematical facilities
 \usepackage{mathtools} % For advanced math formatting (e.g., cases)
 \usepackage{geometry} % For adjustable margins
+\usepackage{graphicx}
 \geometry{a4paper, margin=1in} % Set margins to 1 inch
 
 % ===== CUSTOM THEOREM ENVIRONMENTS =====
@@ -58,6 +59,103 @@ In genereal, the feedback system will have some inputs, states and outputs. Illu
 
 The Nyquist stability criterion is a method for determining the stability of a closed loop control system. Or a feedback system that compares the output to a reference.
 
+
+
+\section{Feedback loop and stability}
+
+Before we get to the Nyquist stability criterion, we need to establish the motivation behind exploring stability. Good performance needs high-gain controllers. Yet, the feedback loop will become unstable if the gain is too high. This is where the Nyquist criterion comes in, it allows us to analyze stability. 
+
+Nyquist criterion involves 
+
+
+\begin{itemize}
+    \item open-loop frequency response function
+    \item magnitude
+    \item phase
+\end{itemize}
+
+
+Two approaches
+
+\begin{enumerate}
+    \item Classical approach in the frequency domain : Single input, single output (SISO)
+    \item state-space models : multiple inputs, multiple outputs (MIMO)
+\end{enumerate}
+
+
+
+\subsection{Standard feedback loop}
+
+\includegraphics{Standard feedback loop.png}
+
+
+
+\begin{itemize}
+    \item r: the reference input, we want the output y to converge towards r
+    \item e: the difference between reference and input. 
+    \item C(s): The controller transfer function. Takes input error
+    \item d: A small unpredictable disturbance to the system, like a gust of wind for a drone
+    \item u: the plant input. 
+    \item P(s): The plant transfer function 
+\end{itemize}
+
+\subsubsection{closed loop transfer functions}
+
+
+
+
+\subsection{Principle of the argument}
+
+
+we have a $ z \in \mathbb{C} $ 
+\[
+     z = a + iw
+\]
+
+Then the argument is the angle of that complex number
+
+
+
+\subsection{Nyquist stability criterion}
+
+
+Nyquist stability criterion determines the stability of a closed loop system based on the Nyquist plot. It states that the stability depends on the number of encirclements of the critical point (-1,0) in the Nyquist plot of the open loop transfer function.
+
+
+
+
+
+
+A closed loop system is stable if the number of encirclements of $ -1 + 0i = N$ in the Nyquist plot is  \[
+N = P - Z
+\] 
+
+where
+
+\begin{itemize}
+    \item \textbf{\textit{P}}: Open loop poles in the right half plane (RHP)
+    \item \textbf{\textit{Z}}: Number of closed-loop poles in the RHP
+\end{itemize}
+
+
+
+
+
+\subsection{Applications of Nyquist plot}
+
+\begin{enumerate}
+    \item Analysis of closed loop stability
+    \item Evaluating \textbf{\textit{stability margins}} and \textbf{\textit{phase margins}}
+    \item Designing PID controllers and compensators in control systems
+\end{enumerate}
+
+
+
+\subsubsection{The Nyquist criterion}
+
+Let n denite the number of poles of $ P(s)C(s) $ in $ 0 \leq Re(s) $. Construct the Nyquist plot of $ P(s)C(s) $, indenting to the right around poles on the imag. axis. Then the feedback system is stable iff the Nyquist plot \textbf{\textit{doesnt pass through $ \frac{-1} {K}  $ and encircles it exactly n times counterclockwise}}  
+
+So what range of K is the system stable then?
 
 
 
