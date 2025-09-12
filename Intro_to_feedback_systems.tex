@@ -84,17 +84,38 @@ Two approaches
 \includegraphics{Standard feedback loop.png}
 
 
+
+\begin{itemize}
+    \item r: the reference input, we want the output y to converge towards r
+    \item e: the difference between reference and input. 
+    \item C(s): The controller transfer function. Takes input error
+    \item d: A small unpredictable disturbance to the system, like a gust of wind for a drone
+    \item u: the plant input. 
+    \item P(s): The plant transfer function 
+\end{itemize}
+
 \subsubsection{closed loop transfer functions}
 
 
 
 
+\subsection{Principle of the argument}
+
+
+we have a $ z \in \mathbb{C} $ 
+\[
+     z = a + iw
+\]
+
+Then the argument is the angle of that complex number
+
+
+
+\subsection{Nyquist stability criterion}
 
 
 Nyquist stability criterion determines the stability of a closed loop system based on the Nyquist plot. It states that the stability depends on the number of encirclements of the critical point (-1,0) in the Nyquist plot of the open loop transfer function.
 
-
-\textbf{\textit{A closed loop system is a system where the outout is compared to a desired refernce output, then the difference becomes an input to the system. An open loop system is a system where the output is not fed back to the input.}}
 
 
 
@@ -112,6 +133,9 @@ where
 \end{itemize}
 
 
+
+
+
 \subsection{Applications of Nyquist plot}
 
 \begin{enumerate}
@@ -119,6 +143,15 @@ where
     \item Evaluating \textbf{\textit{stability margins}} and \textbf{\textit{phase margins}}
     \item Designing PID controllers and compensators in control systems
 \end{enumerate}
+
+
+
+\subsubsection{The Nyquist criterion}
+
+Let n denite the number of poles of $ P(s)C(s) $ in $ 0 \leq Re(s) $. Construct the Nyquist plot of $ P(s)C(s) $, indenting to the right around poles on the imag. axis. Then the feedback system is stable iff the Nyquist plot \textbf{\textit{doesnt pass through $ \frac{-1} {K}  $ and encircles it exactly n times counterclockwise}}  
+
+So what range of K is the system stable then?
+
 
 
 
