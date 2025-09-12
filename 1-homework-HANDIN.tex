@@ -1,0 +1,298 @@
+\documentclass[12pt,A4, onecolumn]{exam}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[lmargin=40pt, tmargin=0.8in]{geometry}  %For centering solution box
+\lhead{TEK4090 -- Introduction to Modern Control\\}
+\rhead{Assignment 1\\}
+% \chead{\hline} % Un-comment to draw line below header
+\thispagestyle{empty}   %For removing header/footer from page 1
+
+\usepackage{graphicx}
+\graphicspath{{../../figs/}}
+
+\def\showsoln{1}
+
+\begin{document}
+
+\begingroup  
+    \centering
+    \LARGE TEK4090 -- Introduction to Modern Control\\
+    \LARGE Assignment 1\\[0.5em]
+    \large Due: September 18 2025, 13:15\\
+\endgroup
+\rule{\textwidth}{0.4pt}
+%\pointsdroppedatright   %Self-explanatory
+\printanswers
+
+
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}   %Replace "Ans:" with starting keyword in solution box
+
+\begin{questions}
+
+  \question[10] Suppose that $v_1,\dots,v_m$ is linearly independent in $V$, and that $w\in V$. Show that
+    \begin{align}
+      v_1,\dots,v_m, w \text{ is linearly independent } \iff w\notin \mathrm{span}(v_1,\dots,v_m).
+    \end{align}
+
+
+  \begin{solution}
+    I will show that $ i) \rightarrow ii) $ and then that $ ii) \rightarrow i) $ 
+    
+    Assume $ v_1, ... , v_m, w $ is lin. indep.
+    
+    Pf by contradiction:
+
+    \begin{align*}
+      w \in span(v1, ..., v_m) \\
+       w &= \alpha_{1}^{} v_1 + ... + \alpha_{m}^ {} v_m  \\
+       0 &= \alpha_{1}^{} v_1 + ... + \alpha_{m}^ {} v_m  + (-1) w\\
+    \end{align*}
+
+    This contradicts that $ v_1, ..., v_m, w $ is linearly independent, because for any combination of indep. vectors, they must equal if and only if all coefficiencts $ \alpha_{1}^{} , ..., \alpha_{m}^{} = 0  $. Since we have that the coefficient of $ w $ is equal to $ -1 \neq 0$, we have that vectors $ v_1, ..., v_m, w $ are indep. and thus, $ w \notin span(v_1, ..., v_m)$    
+
+    will now prove that $ ii) \rightarrow i) $. Will also use proof by contradiction. Assume that $ w \in span(v_1, ..., v_m) $. This means that w can be written as a linear combination of the vectors in $ span(v1, ..., v_m) $ 
+
+    \[
+       w = \alpha_{1}^{} v_1 + ... + \alpha_{m}^{} v_m
+    \]
+
+    This means that by definition, the list $ (v_1, ..., v_m, w) $ is dependent, and this is our contradiction.
+    Thus, for $ v_1, ..., v_m, w $ to be independent, $ w \notin span(v_1, ..., v_m)$ has to be true  
+
+  \end{solution}
+
+  \question[10] Let $A,B\in \mathbb{R}^{n\times n}$, and define the \emph{trace} of $A$ as $\mathrm{tr}(A)=\sum_{i=1}^n A_{ii}$. Show that 
+    \begin{align}
+      \dfrac{d \mathrm{tr}(AB)}{dA} = B^T.
+    \end{align}
+    Hint: Find $\frac{d\mathrm{tr}(AB)}{dA_{ij}}$.
+
+
+    \begin{solution}
+      \begin{align*}
+        tr(AB) &= \sum_{ n }^{ i=1 } (AB)_{i, i} \\
+        &= \sum_{ n }^{ i } \sum_{ n }^{ j } A_{i, j}B_{j, i}
+      \end{align*}
+
+      Thus we get that  
+
+      \begin{align*}
+        \frac{dtr(AB)} {dA_{i,j}} \\
+        &= \frac{d(\sum_{ n }^{ i } \sum_{ n }^{ j } A_{i, j} B_{j, i})} {dA_{i, j}} \\ 
+        &= B_{j, i}
+      \end{align*}
+
+      And if we now replace $ A_{i, j} $ with $ A $ in the denominator, we get
+      
+      \[
+         \frac{d(\sum_{ n }^{ i } \sum_{ n }^{ j } A_{i, j} B_{j, i})} {dA} = B^T
+      \] 
+      
+    \end{solution}
+
+  \question[15] Suppose that $T:V\mapsto V$ is a linear map, and suppose that $S:V\mapsto V$ is an invertible linear map.
+    \begin{parts}
+      \part Prove that $T$ and $S^{-1}TS$ have the same eigenvalues
+      \part Describe the relationship between the eigenvectors of $T$ and the eigenvectors of $S^{-1}TS$.
+
+
+      \begin{solution}
+        We want to prove that 
+
+        \[
+           T(v)=\lambda v = S^{-1}TS(v)
+        \]  
+        Matrix multiply both sides by $ S $ and get
+        \[
+           ST(v) = S(\lambda v) = SS^{-1}TS(v)
+        \]
+        \[
+          SS^{-1}TS(v) = ITS(v) 
+        \] 
+        \[
+           T(S(v)) = \lambda S(v)
+        \] 
+        where $ I $ is the identity matrix 
+
+        Since S is a linear invertible map, we get that $ S
+        (\lambda v) = \lambda S(v)$ 
+
+
+        Now we set $ v = S^{-1}(w) $ og $ T(w) = \lambda w$
+        
+        Da har vi at $ S(v) = w $
+        
+        \begin{align*}
+          S^{-1}TS(v) &= S^{-1}T(w) \\
+          S^{-1}(\lambda w) &= \lambda S^{-1}(w) \\
+          &= \lambda v 
+        \end{align*}
+        
+        which is what we wanted to prove; namely that $ T $ and $ S^{-1}TV $ have similar eigenvalues. This is correct assuming the maps $ T $ is linear and that $ S $ is linear and invertible     
+      \end{solution}
+    \end{parts}
+
+\question[30] Consider the feedback block diagram:
+  \begin{center}
+    %\includegraphics[width=0.75\linewidth]{./%feedback}
+  \end{center}
+\begin{parts}
+  \part Find the transfer function from $d$ to $y$.
+  \part Suppose the plant has transfer function
+\begin{align}
+  P(s) = \dfrac{(s+1)}{s^2-4s+13}
+\end{align} 
+
+
+What are the poles of $P(s)$? What can you infer about the stability of the (open-loop) plant $P(s)$?
+  \part Suppose $C(s)$ is given by 
+    \begin{align}
+      C(s) = \dfrac{1}{s}
+    \end{align}
+    Does $C(s)$ stabilize the feedback system?  
+  \part \label{1} Now, suppose the plant and controller are given by
+    \begin{align}
+      P(s) = \dfrac{10}{(s+1)},~C(s) =\dfrac{K}{s}.
+    \end{align}
+  Find the values of $K$ for which the feedback loop is stable.
+  \part Fix a value of $K$ such that the system in part~(\ref{1}) is stable, and suppose the system is subject to a disturbance $D(s) = 100$. What will the final value of $y$ be?
+\end{parts}
+
+    
+
+    \question[10] Consider the standard feedback system with
+\begin{align}
+C(s) = K,~
+P (s) =\dfrac{
+s^2 + 1}{
+(s^2 + 2)(s - 2)}
+\end{align}
+\begin{parts}
+  
+\part Sketch the Nyquist plot of $P (s)$. Include correct asymptotes to infinity and to the origin.
+
+\begin{solution}
+  Include the figure for the nyquist plot for P(s)
+\end{solution}
+
+\part Indicate the number of encirclements (and their orientations) of all possible critical points.
+
+\begin{solution}
+  To indicate the number of encirclements, I want to talk about the Principle of the argument
+
+  Suppose we have the D contour. An illustration is given here.
+
+  \includegraphics{./D_Contour.png}
+
+
+  From Classical Control (Francis), its stated that when the characteristic polynomial has no right hand poles (RHP), then the system is stable. It can be shown that for a feedback system like we are dealing with now, the characteristic polynomial is equal to
+
+  \[
+     1 + KP(s) = 0
+  \] 
+
+  Since $ C(s) = K $ where K is the gain. The loop gain is defined as the sum of the gain, where gain is explained as the amplified rate of the error between reference and output before its sent into the plant. 
+  
+  \begin{itemize}
+    \item If K is too small, then the system will have large error of steady states and will become too weak
+    \item amplify the gain too much, and the gain is too aggressive, and the loop is destabilized. In our case, the poles of $ 1+KP(s)=0 $ moves into the RHP 
+    \item At some critical gain, the system is marginally unstable, where the poles are located on the imaginary axis.
+  \end{itemize}
+
+  \textbf{\textit{So what is gain margin?}}
+  We will get to this
+  
+
+  Now, the characteristic polynomial is:
+
+  \begin{align*}
+    L(s) &= 1 + K * \frac{(s^2+1)} {(s^2+1)(s-2)} \\
+    \text{A fraction $ =0 $ when the numerator $ =0 $  }\\
+    &= (s^2+2)(s-2) + K(s^2+1)  \\
+    L(jw) &= (jw)^3-(jw)^2(K-2)+2(jw) + (K-4) \\
+    &= j(2w-w^3) + (-w^2(K-2) + (K-4))
+  \end{align*}
+
+  $ L(jw) $ is decomposed into a real and imaginary part. We now find the roots of $ Im(L(jw)) $
+  \[
+     w(2-w^2) = 0
+  \] 
+  Which gives that $w = 0$ or $w = \pm \sqrt{2}$. If we then plug $ w = 0 $ to the real part of $ L(jw) = 0 $, then we find that $ K=4 $. And doing the same for $ w = \pm \sqrt{2} $, we find that $ K=0 $ 
+  
+
+  In order to indicate the number of encirclements and orientations of all possible critical points, we use the Nyquist stability criterion, which states that 
+
+  \[
+     Z = N+P
+  \] 
+
+  where \begin{itemize}
+    \item Z = number of closed-loop poles in the RHP
+    \item N = number of clockwise encirclements of $ \frac{-1} {K} $ by the Nyquist plot.
+    \item P = number of open-loop poles in the RHP
+  \end{itemize}
+
+  We need $ Z=0 $ to be true. 
+
+  We know that there is one open loop pole in the RHP. Namely s = 2. So N must equal -1 for stability.
+  
+  $ K=1 $:
+  
+  From analyzing $ P(jw) $ asymptotically, we can find that for $ w = 0 $, $ P(0) = \frac{-1} {4} $. This means that for $ K \in (0,4) $, i.e., $ \frac{-1} {K} > \frac{-1} {4} $. As w approaches 1, the numerator of $ P(jw) $ goes to 0, and the Nyquist curve crosses the real axis at 0. As w approaches $ \sqrt{2}  $, the curve goes to $ \infty $ and as w crosses $ \sqrt{2} $, the curve goes to $ -\infty $. After this, as w goes to $ \infty $, $ P(jw) ~ -\frac{j}{w} =0$ and it has looped over. Whats important to draw here is that for $ K \in (0,4) $, the curve does not cross the critical point $ \frac{-1} {K}  $ counterclockwise (CCW). And thus, the system is unstable. For $ K=4 $, we have reached the marginal stability point, and for $ K > 4 $, we have stability.
+  
+  This means that for $ K>4$, we have one CCW encirclement, this $ N = -1 $, and $ Z= -1 + 1=0 $ and we have stability.   
+  
+
+\end{solution}
+
+\part For what range of $K$ is the feedback system stable?
+
+\begin{solution}
+  The feedback system is stable for $ K > 4 $. 
+  \begin{itemize}
+    \item $ K>4 $: Stability
+    \item $ K=4 $: marginal stability
+    \item $ K \in (0,4) $: instability   
+  \end{itemize} 
+\end{solution}
+
+\end{parts}
+
+
+  \begin{center}
+    %\includegraphics[width=0.6\linewidth]{./%bode-hwk-1}\\
+    \textbf{Fig.~1:} Bode Plot for Question~(\ref{q:bode})
+  \end{center}
+
+\begin{question}[15]
+  \label{q:bode} Consider the standard feedback system with $C(s) = K$. 
+  The Bode plot of $P (s)$ is given in Figure 1 (magnitude in absolute units, not dB; phase in degrees). 
+  The phase starts at $-180^\circ$ and ends at $-270^\circ$. 
+  You are also given that $P(s)$ has exactly one pole in the right half-plane. 
+  For what range of gains $K$ is the feedback system stable?
+\end{question}
+
+\question[10] Consider the feedback system:
+\begin{center}
+  %\includegraphics[width=0.5\linewidth]{../figs/%k-system}
+\end{center}
+with
+\begin{align}
+  P(s) =
+    \dfrac{s+2}{s^2+2},~C(s) = \dfrac{1}{s}.
+\end{align}
+
+Sketch the Nyquist plot of $PC$. How many encirclements are required of the critical point for feedback stability? Determine the range of real gains $K$ for stability of the feedback system.
+
+
+\question[10]
+
+Repeat the previous question with,
+\begin{align}
+  P(s) = \dfrac{s^2+1}{(s+1)(s^2+s+1)},~C(s) = 1.
+\end{align}
+
+\end{questions}
+
+
+\end{document}
