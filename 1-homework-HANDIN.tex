@@ -134,7 +134,7 @@
 
 \question[30] Consider the feedback block diagram:
   \begin{center}
-    %\includegraphics[width=0.75\linewidth]{./%feedback}
+    \includegraphics[width=0.75\linewidth]{Figures/feedback_block_diagram.png}
   \end{center}
 \begin{parts}
   \part Find the transfer function from $d$ to $y$.
@@ -160,7 +160,7 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
 
     
 
-    \question[10] Consider the standard feedback system with
+\question[10] Consider the standard feedback system with
 \begin{align}
 C(s) = K,~
 P (s) =\dfrac{
@@ -259,10 +259,18 @@ s^2 + 1}{
 \end{parts}
 
 
+\begin{center}
+  \rule[2pt]{15cm}{1pt}  
+\end{center}
+
   \begin{center}
-    %\includegraphics[width=0.6\linewidth]{./%bode-hwk-1}\\
+    \includegraphics[width=0.6\linewidth]{./Figures/Bode_plots_for_Assignment1.png}\\
     \textbf{Fig.~1:} Bode Plot for Question~(\ref{q:bode})
   \end{center}
+
+
+
+
 
 \begin{question}[15]
   \label{q:bode} Consider the standard feedback system with $C(s) = K$. 
@@ -272,9 +280,48 @@ s^2 + 1}{
   For what range of gains $K$ is the feedback system stable?
 \end{question}
 
+
+\begin{solution}
+  We have the fundamental equation stemming from the argument of the principle. 
+
+  \[
+     Z = N + P
+  \] 
+
+  Where 
+
+  \begin{itemize}
+    \item Z = Number of closed-loop poles in RHP
+    \item N = number of CCW encirclements of -1 by the Nyqist plot $ KP(s) $
+    \item P = number of open-loop poes of $ KP(s) $ in RHP  
+  \end{itemize}
+
+  Since we are given that $ P=1 $, then $ N=-1 $ must be true for our feedback system to be stable. This happens when we have a CW encirclement of the critical point. To find this range of K, we can see from the Bode plot that the phase of $ P(jw) $, which can be explained as the angle, stays pretty much constant as the frequency approaches 1. When this happens
+
+  \[
+     |P(jw_{180})| \approx 1
+  \] 
+
+  For there to be an encirclement, the point must start to the left of the critical point. i.e. when 
+
+  \[
+     K\| P(jw) \| = -1
+  \] 
+
+  For $ K < 1 $, we have $ | KP(jw) | < 1 $ and we will have no encirclements of $ -1 $
+  
+  For $ K > 1 $, we have that $ | KP(jw) | > 1 $ and we have an encirclement of $ -1 $, which implies that $ N=-1 $ and we have 
+  
+  \[
+     Z = (-1) + 1 = 0
+  \] 
+  Which from Nyquist stability criterion entails that the system is stable. The answer to the question of what range of gains K gives stability for the feedback system, the answer is that $ K > 1 $ 
+
+\end{solution}
+
 \question[10] Consider the feedback system:
 \begin{center}
-  %\includegraphics[width=0.5\linewidth]{../figs/%k-system}
+  \includegraphics[width=0.5\linewidth]{Figures/feedback_system_q7.png}
 \end{center}
 with
 \begin{align}
@@ -283,6 +330,35 @@ with
 \end{align}
 
 Sketch the Nyquist plot of $PC$. How many encirclements are required of the critical point for feedback stability? Determine the range of real gains $K$ for stability of the feedback system.
+
+
+\begin{solution}
+
+
+  $ P(s)C(s) $ is the following: 
+  
+  \[
+     P(s)C(s) = \frac{s+2} {s^3+s} 
+  \] 
+  Here is the sketch of the Nyquist plot
+
+  
+
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{Figures/Nyquist_Plot_q7.png}
+  \end{center}
+
+
+  The denominator of PC is $ s(s^2+2) $, and the roots of this equation is
+  \begin{itemize}
+    \item $ 0 $ 
+    \item $-\sqrt{2} i$
+    \item $+\sqrt{2} i$
+  \end{itemize}  
+
+  Of which, none are in the right hand plane. Therefore, we need no encirclements of the critical point regardless if its counterclockwise or clockwise for the feedback system to be stable.
+  
+\end{solution}
 
 
 \question[10]
