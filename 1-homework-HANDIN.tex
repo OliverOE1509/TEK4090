@@ -118,9 +118,9 @@
         (\lambda v) = \lambda S(v)$ 
 
 
-        Now we set $ v = S^{-1}(w) $ og $ T(w) = \lambda w$
+        Now we set $ v = S^{-1}(w) $ and $ T(w) = \lambda w$
         
-        Da har vi at $ S(v) = w $
+        Then we have that $ S(v) = w $
         
         \begin{align*}
           S^{-1}TS(v) &= S^{-1}T(w) \\
@@ -138,6 +138,31 @@
   \end{center}
 \begin{parts}
   \part Find the transfer function from $d$ to $y$.
+
+  \begin{solution}
+    
+  
+    The transfer function $ T(s)=\frac{Y(S)} {D(S)} $ where
+    
+    \begin{itemize}
+      \item $ Y(S)=P(s) \left( C(s)+D(s) \right)$
+      \item $ C(s)=U(s)E(s) $
+      \item $ E(s)=R(s)-Y(s) $   
+    \end{itemize}
+
+    We are not interested in the error, so we set the reference to 0. 
+
+    \begin{align*}
+      Y(s)&=P(s) U(s) + P(s)D(s) \\
+      &= P(s) \left[ -Y(s)C(s) \right] P(s)D(s) \\
+      Y(s) \left[1+P(s)C(s) \right] &= P(s)D(s) \\
+      \frac{Y(s)} {D(s)} &= \frac{P(s)} {1+P(s)C(s)}  
+    \end{align*}
+
+
+
+  \end{solution}
+
   \part Suppose the plant has transfer function
 \begin{align}
   P(s) = \dfrac{(s+1)}{s^2-4s+13}
@@ -145,11 +170,31 @@
 
 
 What are the poles of $P(s)$? What can you infer about the stability of the (open-loop) plant $P(s)$?
+
+\begin{solution}
+  We have an unstable open-loop plant, if at least one root of the denominator is located in the RHP. For $ P(s) = \frac{N} {D}  $, we have
+  
+  \[
+     s^2-4s+13 = 0
+  \] 
+
+  In the abc formula, this gives 
+  \[
+     2 \pm j 3
+  \] 
+
+  Since the real part of both roots are $ > 0 $, we have instability of the plant $ P(s) $.  
+\end{solution}
+
   \part Suppose $C(s)$ is given by 
     \begin{align}
       C(s) = \dfrac{1}{s}
     \end{align}
     Does $C(s)$ stabilize the feedback system?  
+
+    \begin{solution}
+      The 
+    \end{solution}
   \part \label{1} Now, suppose the plant and controller are given by
     \begin{align}
       P(s) = \dfrac{10}{(s+1)},~C(s) =\dfrac{K}{s}.
@@ -357,6 +402,27 @@ Sketch the Nyquist plot of $PC$. How many encirclements are required of the crit
   \end{itemize}  
 
   Of which, none are in the right hand plane. Therefore, we need no encirclements of the critical point regardless if its counterclockwise or clockwise for the feedback system to be stable.
+
+
+  Furthermore, we can solve for which K that gives stability, by decomposing the equation PC to a real and imaginary part, and solve for which solutions of w that gives no imaginary part. 
+
+  \[
+     L(s) = KC(s)P(s)
+  \] 
+
+  \begin{align*}
+    L(s) &= \frac{K} {s} * \frac{s+2} {s^2+2} \\
+    L(jw) &= \frac{K} {jw} * \frac{jw+2} {2-w^2} \\
+    &= \frac{K} {2-w^2} * \left(1 - \frac{2j} {w} \right) \\
+    &= \frac{K} {2-w^2} - j \left(\frac{2K} {w(2-w^2)} \right) 
+  \end{align*}
+
+
+  So when the imaginary part has two solutions, then we know that we have a stable system if we then pick $ \frac{-1} {K} $ to in that interval. 
+  
+  But since $ \frac{2K} {2(2-w^2)} =0 $ has no solutions, we cannot find such a interval where the Nyquist plot encircles the point $ \frac{-1} {K}  $ and we have no stability. 
+
+  
   
 \end{solution}
 
@@ -367,6 +433,28 @@ Repeat the previous question with,
 \begin{align}
   P(s) = \dfrac{s^2+1}{(s+1)(s^2+s+1)},~C(s) = 1.
 \end{align}
+
+\begin{solution}
+  By plotting the nyquist curve in matlab, we get the Nyquist curve:
+
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{Figures/Nyquist_exc8.png}
+  \end{center}
+
+  \[
+     P(s) = \frac{s^2+1} {(s+1)(s^2+s+1)} 
+  \] 
+
+  This plant has poles in
+  
+  \begin{itemize}
+    \item $ s = -1 $
+    \item $ \frac{-1} {2} + \frac{j\sqrt{3}} {2}   $
+    \item $ \frac{-1} {2} - \frac{j\sqrt{3}} {2}   $  
+  \end{itemize}
+
+  Since all these solutions are in the LHP, then the nyquist plot of $ P(s) $ must have no encirclements of the critical point $ \frac{-1} {K}  $ for the feedback system to be stable. We can easily see that for $ K>0 $ we have this condition satisfied.
+\end{solution}
 
 \end{questions}
 
