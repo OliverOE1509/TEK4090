@@ -1,11 +1,11 @@
 
 function stability_analysis_simple()
-    P = tf([1 0 1], [1 2 2 1]);
+    P = tf([1 0 1], [1 -2 2 -4]);
     C = tf([1], [1]);
 
-    K_min = -100;
+    K_min = -10;
     K_max = 100;
-    n_points = abs(K_max - K_min)*1000; % More points for better numeric approximation, but this seems to do the job.
+    n_points = abs(K_max - K_min)*100; % More points for better numeric approximation, but this seems to do the job.
     K_values = linspace(K_min, K_max, n_points);
     
     is_stable = false(size(K_values));
@@ -91,67 +91,5 @@ function stability_analysis_simple()
     end
 end
 
-stability_analysis_simple()
-
 
 %% 
-
-
-% Helper function for detailed analysis at specific K values
-function analyze_specific_K(num_P, den_P, num_C, den_C, K_values)
-    % Precompute the polynomial components
-    den_product = conv(den_P, den_C);
-    num_product = conv(num_P, num_C);
-    
-    % Ensure both polynomials have the same length
-    max_length = max(length(den_product), length(num_product));
-    den_product_padded = [zeros(1, max_length - length(den_product)), den_product];
-    num_product_padded = [zeros(1, max_length - length(num_product)), num_product];
-    
-    for K = K_values
-        fprintf('\n=== Detailed Analysis for K = %.4f ===\n', K);
-        
-        % Form the characteristic polynomial
-        char_poly = den_product_padded + K * num_product_padded;
-        
-        % Find roots
-        r = roots(char_poly);
-        
-        % Display results
-        fprintf('Characteristic polynomial: ');
-        % Create a nice string representation
-        poly_str = '';
-        for j = 1:length(char_poly)
-            if char_poly(j) ~= 0
-                if j == 1
-                    poly_str = sprintf('%.4f', char_poly(j));
-                else
-                    exponent = length(char_poly) - j;
-                    if exponent == 1
-                        poly_str = sprintf('%s + %.4fs', poly_str, char_poly(j));
-                    else
-                        poly_str = sprintf('%s + %.4fs^%d', poly_str, char_poly(j), exponent);
-                    end
-                end
-            end
-        end
-        disp(poly_str);
-        
-        fprintf('Roots:\n');
-        for j = 1:length(r)
-            fprintf('  s%d = %.4f %+.4fi\n', j, real(r(j)), imag(r(j)));
-        end
-        
-        % Check stability
-        if all(real(r) < 0)
-            fprintf('✓ SYSTEM IS STABLE\n');
-        else
-            fprintf('✗ SYSTEM IS UNSTABLE\n');
-        end
-    end
-end
-
-
-
-% Optional: Analyze specific points of interest
-analyze_specific_K([1, 0, 1], [1, 2, 2, 1], [1], [1, 0], 1);

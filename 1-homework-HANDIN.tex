@@ -1,6 +1,8 @@
 \documentclass[12pt,A4, onecolumn]{exam}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
 \usepackage[lmargin=40pt, tmargin=0.8in]{geometry}  %For centering solution box
 \lhead{TEK4090 -- Introduction to Modern Control\\}
 \rhead{Assignment 1\\}
@@ -193,14 +195,125 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
     Does $C(s)$ stabilize the feedback system?  
 
     \begin{solution}
-      The 
+      To find this out if controller $ C(s) $ stabilizes the system, I find the roots of the characteristic equation 
+
+      \[
+         1 + C(s)P(s)=0
+      \] 
+
+      If 
+
+      \begin{itemize}
+        \item $ C(s) = \frac{C_n} {C_d} $
+        \item $ P(s) = \frac{P_n} {P_d} $  
+      \end{itemize}
+
+      I can formulate algebraically the new equation 
+
+      \[
+         C_d * P_d + C_n * P_n = 0
+      \] 
+
+      In matlab, this gives the following roots
+
+      \begin{itemize}
+        \item $ 2.0350 + 3.1849i $
+        \item $ 2.0350 - 3.1849i $
+        \item $ -0.0700 + 0.0000i $ 
+      \end{itemize}
+
+      This confirms that $ C(s) $ does not indeed stabilize the feedback system
+      
+      Here is the script I used:
+
+      \begin{verbatim}
+        nC = [1];
+        dC = [1,0];
+
+        nP= [1,1];
+        dP = [1,-4,13];
+
+        numProd = conv(nD, nC);
+        denProd = conv(dC, dD);
+
+        ml = max(length(denProd), length(numProd));
+        denProd_padded = [zeros(1, ml - length(denProd)), denProd];
+        numProd_padded = [zeros(1, ml - length(numProd)), numProd];
+
+        char_poly = denProd_padded + numProd_padded;
+
+        r = roots(char_poly);
+        disp(r)
+      \end{verbatim}
+
     \end{solution}
   \part \label{1} Now, suppose the plant and controller are given by
     \begin{align}
       P(s) = \dfrac{10}{(s+1)},~C(s) =\dfrac{K}{s}.
     \end{align}
   Find the values of $K$ for which the feedback loop is stable.
+
+  \begin{solution}
+    We are now given a gain K, and we will have to find the interval of K that makes the feedback system stable where $ P(s) = \frac{10} {s+1} $ and $ C(s)= \frac{K} {s}  $  
+
+    Numerically, I have written a script that defines K as an array of equally spaced points, decided by a discretization step, that increases accuracy the higher it is.
+
+    I get from my numeric estimation that for all $ 0 < K $, the system becomes stable. The following graph shows a parametrization of this fact, where the gain K is plotted on the x-axis, and stability is true $ (=1) $ if K gives stability, and 0 otherwise
+    
+    Its a step function of sorts
+    \[
+       y(K) = \begin{cases}
+        1& \text{if K gives stability}\\
+        0& \text{otherwise}
+       \end{cases}
+    \] 
+
+    \begin{center}
+      \includegraphics[width=0.75\linewidth]{Figures/stability_plot.pdf}
+    \end{center}
+
+    This can also be solved analytically by taking the transfer function, put in the new $ P(s) $ and $ C(s) $ and solve 
+    
+    \begin{align*}
+      \frac{P(s)} {1+P(s)C(s)} &= \frac{\frac{10} {s+1}} {1 + \frac{10K} {s^2+s} }  \\
+      &= \frac{(s^2+s) \frac{10} {s+1} } {s^2+s+10K} 
+    \end{align*}
+
+    In the abc-formula, this becomes 
+
+    \[
+       \frac{-1 \pm \sqrt{1-40K}} {2} 
+    \] 
+    If $ K=0 $ this gives that $ s=0 $ ans $ s=-1/2 $ which gives marginal stability, and for $ K<0 $, it gives that s has positive roots. so $ K>0 $ gives stability, which is justified by the graph.
+    
+    The key insight is that K adds phase lag, improving steady state performance
+  \end{solution}
+
   \part Fix a value of $K$ such that the system in part~(\ref{1}) is stable, and suppose the system is subject to a disturbance $D(s) = 100$. What will the final value of $y$ be?
+
+  \begin{solution}
+    To solve this, we state the final value theorem.
+
+    \[
+       lim_{t\rightarrow \infty} y(t) = lim_{s \rightarrow 0} sY(s)
+    \] 
+
+    we have that 
+    \[
+       Y(s) = \frac{C(s)P(s)} {1+P(s)C(s)}R(s) + \frac{P(s)} {1+P(s)C(s)} D(s)  
+    \] 
+
+    We set $ R(s) =0$ because we dont care about reference when we allow for external disturbances in this case, because we want to examine how disturbances affects our equilibrium state. We also set $ D(s) = \frac{100} {s}  $ because it is a step function, and $ d=100 $   transformed to the laplace domain, we have that $ D(s)=\frac{100} {s}  $   
+    
+    so we have 
+
+    \begin{align*}
+      lim_{t \rightarrow \infty} s \frac{\frac{10} {1+s} } {1+\frac{10K} {s(s+1)} } * \frac{100} {s}  &= lim_{t \rightarrow \infty} \frac{1000s} {s^2+s+10K} \\
+      &= 0 
+    \end{align*}
+
+    
+  \end{solution}
 \end{parts}
 
     
@@ -218,6 +331,10 @@ s^2 + 1}{
 
 \begin{solution}
   Include the figure for the nyquist plot for P(s)
+
+  \begin{center}
+      \includegraphics[width=0.75\linewidth]{Figures/nyquist_fiveA.pdf}
+  \end{center}
 \end{solution}
 
 \part Indicate the number of encirclements (and their orientations) of all possible critical points.
@@ -226,8 +343,6 @@ s^2 + 1}{
   To indicate the number of encirclements, I want to talk about the Principle of the argument
 
   Suppose we have the D contour. An illustration is given here.
-
-  \includegraphics{./D_Contour.png}
 
 
   From Classical Control (Francis), its stated that when the characteristic polynomial has no right hand poles (RHP), then the system is stable. It can be shown that for a feedback system like we are dealing with now, the characteristic polynomial is equal to
@@ -243,9 +358,6 @@ s^2 + 1}{
     \item amplify the gain too much, and the gain is too aggressive, and the loop is destabilized. In our case, the poles of $ 1+KP(s)=0 $ moves into the RHP 
     \item At some critical gain, the system is marginally unstable, where the poles are located on the imaginary axis.
   \end{itemize}
-
-  \textbf{\textit{So what is gain margin?}}
-  We will get to this
   
 
   Now, the characteristic polynomial is:
@@ -272,9 +384,9 @@ s^2 + 1}{
   \] 
 
   where \begin{itemize}
-    \item Z = number of closed-loop poles in the RHP
-    \item N = number of clockwise encirclements of $ \frac{-1} {K} $ by the Nyquist plot.
-    \item P = number of open-loop poles in the RHP
+    \item Z = number of closed-loop poles in the RHP (i.e. the roots of the characteristic equation)
+    \item N = number of counterclockwise (CCW) encirclements of $ \frac{-1} {K} $ by the Nyquist plot.
+    \item P = number of open-loop poles in the RHP (i.e. the poles of $ P(s)C(s ) $ )
   \end{itemize}
 
   We need $ Z=0 $ to be true. 
@@ -299,6 +411,42 @@ s^2 + 1}{
     \item $ K=4 $: marginal stability
     \item $ K \in (0,4) $: instability   
   \end{itemize} 
+
+  We begin finding stability range by finding what solutions of 
+  \[
+     1 + KP(s)=0
+  \] 
+  has negative real solutions. 
+
+  \begin{align*}
+    1+ KP(s) &= 1+ K \frac{(s^2+1)} {(s^2+2)(s-2)} \\
+    (s^2+2)(s-2) + K(s^2+1) &= 0 \\
+    s^3-2s^2+2s-4 + Ks^2+K &= 0 \\
+    s^3 +s^2(K-2) + 2s + (K-4) &=0
+  \end{align*}
+
+  This is pretty hard to solve, but numerically with our matlab solver, we find that the range of stability is
+  \[
+     \left[ 4.0013, 100.0000 \right]
+  \] 
+  
+  When I increase 100 it just becomes the max of the range, so for $ K > 4 $, we have stability. 
+
+  This is my output for $ K=4 $ in my stability test 
+  
+
+  \begin{verbatim}
+    === Detailed Analysis for K = 4.0000 ===
+    Characteristic polynomial: 1.0000 + 2.0000s^2 + 2.0000s
+    Roots:
+      s1 = 0.0000 +0.0000i
+      s2 = -1.0000 +1.0000i
+      s3 = -1.0000 -1.0000i
+    SYSTEM IS UNSTABLE
+  \end{verbatim}
+
+  If we look at the plot from a), we find that for the critial point $ \frac{-1} {K}  $, it has one CW encirclement, if K > 4, and thus $ N=-1 $ and $ Z = N+ P = -1 + 1=0 $ which means the system is stable according to the Nyquist stability criterion.  
+
 \end{solution}
 
 \end{parts}
@@ -390,8 +538,9 @@ Sketch the Nyquist plot of $PC$. How many encirclements are required of the crit
   
 
   \begin{center}
-    \includegraphics[width=0.8\linewidth]{Figures/Nyquist_Plot_q7.png}
+    \includegraphics[width=0.8\linewidth]{Figures/nyquist_seven.pdf}
   \end{center}
+  
 
 
   The denominator of PC is $ s(s^2+2) $, and the roots of this equation is
@@ -417,13 +566,7 @@ Sketch the Nyquist plot of $PC$. How many encirclements are required of the crit
     &= \frac{K} {2-w^2} - j \left(\frac{2K} {w(2-w^2)} \right) 
   \end{align*}
 
-
-  So when the imaginary part has two solutions, then we know that we have a stable system if we then pick $ \frac{-1} {K} $ to in that interval. 
-  
-  But since $ \frac{2K} {2(2-w^2)} =0 $ has no solutions, we cannot find such a interval where the Nyquist plot encircles the point $ \frac{-1} {K}  $ and we have no stability. 
-
-  
-  
+  This has no finite solutions for any rational $ w $, only as w approaches $ \infty $ which means that the system is stable for all $ K>0 $ $ \frac{-1} {K}  $ is then in the LHP    
 \end{solution}
 
 
@@ -438,7 +581,7 @@ Repeat the previous question with,
   By plotting the nyquist curve in matlab, we get the Nyquist curve:
 
   \begin{center}
-    \includegraphics[width=0.8\linewidth]{Figures/Nyquist_exc8.png}
+    \includegraphics[width=0.8\linewidth]{Figures/nyquist_eight.pdf}
   \end{center}
 
   \[
@@ -453,10 +596,180 @@ Repeat the previous question with,
     \item $ \frac{-1} {2} - \frac{j\sqrt{3}} {2}   $  
   \end{itemize}
 
-  Since all these solutions are in the LHP, then the nyquist plot of $ P(s) $ must have no encirclements of the critical point $ \frac{-1} {K}  $ for the feedback system to be stable. We can easily see that for $ K>0 $ we have this condition satisfied.
+  Since all these solutions are in the LHP, then the nyquist plot of $ P(s) $ must have no encirclements of the critical point $ \frac{-1} {K}  $ for the feedback system to be stable. By examining, if we take $ K=\frac{-1} {2}  $ for instance, we get that the critical point $ \frac{-1} {K}=2  $, which the nyquist plot does encircle at all. And for $ K>0 $ we can obviously see that this is a stable critical point. Thus, the range
+  
+  \[
+     \left( -1, \infty \right) 
+  \] 
+
+  gives a stable feedback system
 \end{solution}
 
 \end{questions}
+
+
+Here is the code for calculating the stable K range
+
+\begin{lstlisting}[language=Matlab]
+
+function stability_analysis_simple()
+    P = tf([1 0 1], [1 2 2 1]);
+    C = tf([1], [1]);
+
+    K_min = -100;
+    K_max = 100;
+    n_points = abs(K_max - K_min)*1000; % More points for better numeric approximation, but this seems to do the job.
+    K_values = linspace(K_min, K_max, n_points);
+    
+    is_stable = false(size(K_values));
+    stability_boundaries = [];
+    
+    for i = 1:length(K_values)
+        K = K_values(i);
+        
+        % Closed-loop system
+        T = feedback(K * C * P, 1);
+        is_stable(i) = isstable(T);
+        
+        % Detect stability boundaries (where stability changes)
+        if i > 1 && is_stable(i) ~= is_stable(i-1)
+            stability_boundaries = [stability_boundaries, K_values(i)];
+        end
+    end
+    stable_indices = find(is_stable);
+    
+    if isempty(stable_indices)
+        fprintf('No stable K values found in range [%.2f, %.2f]\n', K_min, K_max);
+    else
+        K_stable_min = K_values(stable_indices(1));
+        K_stable_max = K_values(stable_indices(end));
+        
+        fprintf('\n=== STABILITY ANALYSIS RESULTS ===\n');
+        fprintf('Stable range: K \in [%.4f, %.4f]\n', K_stable_min, K_stable_max);
+        fprintf('Stability boundaries found at: ');
+        if ~isempty(stability_boundaries)
+            fprintf('K = %.4f', stability_boundaries(1));
+            for j = 2:length(stability_boundaries)
+                fprintf(', K = %.4f', stability_boundaries(j));
+            end
+            fprintf('\n');
+        else
+            fprintf('None detected in tested range\n');
+        end
+        fprintf('Number of stable K values: %d/%d\n', sum(is_stable), length(K_values));
+    end
+    
+    % Plot the stability results
+    figure;
+    stem(K_values, is_stable, 'filled', 'MarkerSize', 2);
+    xlabel('Gain K');
+    ylabel('Stability (1 = Stable, 0 = Unstable)');
+    title('Stability vs Gain K');
+    grid on;
+    ylim([-0.1 1.1]);
+    
+    % Highlight stable region
+    if ~isempty(stable_indices)
+        hold on;
+        area(K_values(stable_indices), ones(size(stable_indices)), ...
+            'FaceColor', 'g', 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+        hold off;
+        legend('Stability', 'Stable Region', 'Location', 'best');
+    end
+    
+    % Test and display a few specific points for verification
+    fprintf('\n=== VERIFICATION AT SPECIFIC POINTS ===\n');
+    test_points = unique([K_min, K_stable_min, 0, K_stable_max, K_max, stability_boundaries]);
+    test_points = test_points(isfinite(test_points));
+    
+    for i = 1:min(6, length(test_points)) % Show up to 6 points
+        K = test_points(i);
+        T = feedback(K * C * P, 1);
+        poles = pole(T);
+        
+        fprintf('K = %7.3f: ', K);
+        if isstable(T)
+            fprintf('STABLE   ');
+        else
+            fprintf('UNSTABLE ');
+        end
+        fprintf('Poles: ');
+        for j = 1:min(3, length(poles)) % Show up to 3 poles
+            fprintf('%.3f%+.3fi ', real(poles(j)), imag(poles(j)));
+        end
+        if length(poles) > 3
+            fprintf('...');
+        end
+        fprintf('\n');
+    end
+end
+
+stability_analysis_simple()
+
+
+%% 
+
+
+% Helper function for detailed analysis at specific K values
+function analyze_specific_K(num_P, den_P, num_C, den_C, K_values)
+    % Precompute the polynomial components
+    den_product = conv(den_P, den_C);
+    num_product = conv(num_P, num_C);
+    
+    % Ensure both polynomials have the same length
+    max_length = max(length(den_product), length(num_product));
+    den_product_padded = [zeros(1, max_length - length(den_product)), den_product];
+    num_product_padded = [zeros(1, max_length - length(num_product)), num_product];
+    
+    for K = K_values
+        fprintf('\n=== Detailed Analysis for K = %.4f ===\n', K);
+        
+        % Form the characteristic polynomial
+        char_poly = den_product_padded + K * num_product_padded;
+        
+        % Find roots
+        r = roots(char_poly);
+        
+        % Display results
+        fprintf('Characteristic polynomial: ');
+        % Create a nice string representation
+        poly_str = '';
+        for j = 1:length(char_poly)
+            if char_poly(j) ~= 0
+                if j == 1
+                    poly_str = sprintf('%.4f', char_poly(j));
+                else
+                    exponent = length(char_poly) - j;
+                    if exponent == 1
+                        poly_str = sprintf('%s + %.4fs', poly_str, char_poly(j));
+                    else
+                        poly_str = sprintf('%s + %.4fs^%d', poly_str, char_poly(j), exponent);
+                    end
+                end
+            end
+        end
+        disp(poly_str);
+        
+        fprintf('Roots:\n');
+        for j = 1:length(r)
+            fprintf('  s%d = %.4f %+.4fi\n', j, real(r(j)), imag(r(j)));
+        end
+        
+        % Check stability
+        if all(real(r) < 0)
+            fprintf('SYSTEM IS STABLE\n');
+        else
+            fprintf('SYSTEM IS UNSTABLE\n');
+        end
+    end
+end
+
+
+
+% Optional: Analyze specific points of interest
+analyze_specific_K([1, 0, 1], [1, 2, 2, 1], [1], [1, 0], 1);
+
+\end{lstlisting}
 
 
 \end{document}
