@@ -50,7 +50,7 @@
        0 &= \alpha_{1}^{} v_1 + ... + \alpha_{m}^ {} v_m  + (-1) w\\
     \end{align*}
 
-    This contradicts that $ v_1, ..., v_m, w $ is linearly independent, because for any combination of indep. vectors, they must equal if and only if all coefficiencts $ \alpha_{1}^{} , ..., \alpha_{m}^{} = 0  $. Since we have that the coefficient of $ w $ is equal to $ -1 \neq 0$, we have that vectors $ v_1, ..., v_m, w $ are indep. and thus, $ w \notin span(v_1, ..., v_m)$    
+    This contradicts that $ v_1, ..., v_m, w $ is linearly independent, because for any combination of indep. vectors, they must equal if and only if all coefficients $ \alpha_{1}^{} , ..., \alpha_{m}^{} = 0  $. This contradicts independence, since a non-trivial linear combination gives 0. Hence, $ w \notin span(v_1, ..., v_m) $    
 
     will now prove that $ ii) \rightarrow i) $. Will also use proof by contradiction. Assume that $ w \in span(v_1, ..., v_m) $. This means that w can be written as a linear combination of the vectors in $ span(v1, ..., v_m) $ 
 
@@ -130,7 +130,7 @@
           &= \lambda v 
         \end{align*}
         
-        which is what we wanted to prove; namely that $ T $ and $ S^{-1}TV $ have similar eigenvalues. This is correct assuming the maps $ T $ is linear and that $ S $ is linear and invertible     
+        which is what we wanted to prove; namely that $ T $ and $ S^{-1}TV $ are similar, and thus have simialr eigenvalues. This is correct assuming the maps $ T $ is linear and that $ S $ is linear and invertible     
       \end{solution}
     \end{parts}
 
@@ -284,7 +284,7 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
     \[
        \frac{-1 \pm \sqrt{1-40K}} {2} 
     \] 
-    If $ K=0 $ this gives that $ s=0 $ ans $ s=-1/2 $ which gives marginal stability, and for $ K<0 $, it gives that s has positive roots. so $ K>0 $ gives stability, which is justified by the graph.
+    If $ K=0 $ this gives that $ s=0 $ and $ s=-1/2 $ which gives marginal stability, and for $ K<0 $, it gives that s has positive roots. so $ K>0 $ gives stability, which is justified by the graph.
     
     The key insight is that K adds phase lag, improving steady state performance
   \end{solution}
@@ -341,9 +341,6 @@ s^2 + 1}{
 
 \begin{solution}
   To indicate the number of encirclements, I want to talk about the Principle of the argument
-
-  Suppose we have the D contour. An illustration is given here.
-
 
   From Classical Control (Francis), its stated that when the characteristic polynomial has no right hand poles (RHP), then the system is stable. It can be shown that for a feedback system like we are dealing with now, the characteristic polynomial is equal to
 
@@ -445,7 +442,7 @@ s^2 + 1}{
     SYSTEM IS UNSTABLE
   \end{verbatim}
 
-  If we look at the plot from a), we find that for the critial point $ \frac{-1} {K}  $, it has one CW encirclement, if K > 4, and thus $ N=-1 $ and $ Z = N+ P = -1 + 1=0 $ which means the system is stable according to the Nyquist stability criterion.  
+  If we look at the plot from a), we find that for the critical point $ \frac{-1} {K}  $, it has one CW encirclement, if K > 4, and thus $ N=-1 $ and $ Z = N+ P = -1 + 1=0 $ which means the system is stable according to the Nyquist stability criterion.  
 
 \end{solution}
 
@@ -489,11 +486,9 @@ s^2 + 1}{
     \item P = number of open-loop poes of $ KP(s) $ in RHP  
   \end{itemize}
 
-  Since we are given that $ P=1 $, then $ N=-1 $ must be true for our feedback system to be stable. This happens when we have a CW encirclement of the critical point. To find this range of K, we can see from the Bode plot that the phase of $ P(jw) $, which can be explained as the angle, stays pretty much constant as the frequency approaches 1. When this happens
+  Since we are given that $ P=1 $, then $ N=-1 $ must be true for our feedback system to be stable. This happens when we have a CW encirclement of the critical point. 
 
-  \[
-     |P(jw_{180})| \approx 1
-  \] 
+  From the bode plot, we see that the phase starts at $-180$ and ends at $-270$ degrees. This mean that the Nyquist curve begins on the real axis and rotates downward. At the frequency where the phase is $-180$, the magnitude determines whether the point is encircled.
 
   For there to be an encirclement, the point must start to the left of the critical point. i.e. when 
 
@@ -501,9 +496,14 @@ s^2 + 1}{
      K\| P(jw) \| = -1
   \] 
 
-  For $ K < 1 $, we have $ | KP(jw) | < 1 $ and we will have no encirclements of $ -1 $
+  \begin{itemize}
+    \item For $ K < 1 $, we have $ | KP(jw) | < 1 $ and we will have no encirclements of $ -1 $
+    \item For $K=1$, the Nyquist curve passes through our critical point, and we have marginal stability.
+    \item For $ K > 1 $, we have that $ | KP(jw) | > 1 $ and we have an encirclement of $ -1 $
+  \end{itemize}
   
-  For $ K > 1 $, we have that $ | KP(jw) | > 1 $ and we have an encirclement of $ -1 $, which implies that $ N=-1 $ and we have 
+  
+  So for $ K > 1$, we have that $ N=-1 $ and we have 
   
   \[
      Z = (-1) + 1 = 0
