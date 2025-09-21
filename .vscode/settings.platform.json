@@ -1,5 +1,0 @@
-{
-  "latex-workshop.latex.env": {
-    "PATH": "/Library/TeX/texbin:${env:PATH}"
-  }
-}
