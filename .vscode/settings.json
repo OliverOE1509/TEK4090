@@ -1,6 +1,0 @@
-{
-  "extends": [
-    "./.vscode/settings.json",
-    "./.vscode/settings.platform.json"
-  ]
-}
