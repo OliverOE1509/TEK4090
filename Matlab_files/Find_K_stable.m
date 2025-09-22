@@ -154,4 +154,4 @@ end
 
 
 % Optional: Analyze specific points of interest
-analyze_specific_K([1, 0, 1], [1, 2, 2, 1], [1], [1, 0], 1);
+analyze_specific_K([1, 0, 1], [1, -2, 2, -4], [1], [1], 5);

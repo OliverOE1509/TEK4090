@@ -97,7 +97,6 @@
   \question[15] Suppose that $T:V\mapsto V$ is a linear map, and suppose that $S:V\mapsto V$ is an invertible linear map.
     \begin{parts}
       \part Prove that $T$ and $S^{-1}TS$ have the same eigenvalues
-      \part Describe the relationship between the eigenvectors of $T$ and the eigenvectors of $S^{-1}TS$.
 
 
       \begin{solution}
@@ -134,6 +133,14 @@
         
         which is what we wanted to prove; namely that $ T $ and $ S^{-1}TV $ are similar, and thus have simialr eigenvalues. This is correct assuming the maps $ T $ is linear and that $ S $ is linear and invertible     
       \end{solution}
+
+
+      \part Describe the relationship between the eigenvectors of $T$ and the eigenvectors of $S^{-1}TS$.
+
+      \begin{solution}
+        If $ v $  is an eigenvector of $ T $, then $ S^{-1}(v) $ is an eigenvector of $ S^{-1}TS $   
+      \end{solution}
+      
     \end{parts}
 
 \question[30] Consider the feedback block diagram:
@@ -248,6 +255,8 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
         disp(r)
       \end{verbatim}
 
+      So no, $ C(s) = \frac{1} {s}  $ does not stabilize the system because the characteristic equation $ 1+ P(s)C(s) =0$ has roots with positive real parts  
+
     \end{solution}
   \part \label{1} Now, suppose the plant and controller are given by
     \begin{align}
@@ -277,8 +286,9 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
     This can also be solved analytically by taking the transfer function, put in the new $ P(s) $ and $ C(s) $ and solve 
     
     \begin{align*}
-      \frac{P(s)} {1+P(s)C(s)} &= \frac{\frac{10} {s+1}} {1 + \frac{10K} {s^2+s} }  \\
-      &= \frac{(s^2+s) \frac{10} {s+1} } {s^2+s+10K} 
+      1+P(s)C(s) &= 1 + \frac{10K} {s(s+1)}=0 \\
+      &= s(s+1) + 10K = 0 \\
+      &= s^2+s+10K= 0 \\  
     \end{align*}
 
     In the abc-formula, this becomes 
@@ -286,7 +296,7 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
     \[
        \frac{-1 \pm \sqrt{1-40K}} {2} 
     \] 
-    If $ K=0 $ this gives that $ s=0 $ and $ s=-1/2 $ which gives marginal stability, and for $ K<0 $, it gives that s has positive roots. so $ K>0 $ gives stability, which is justified by the graph.
+    If $ K=0 $ this gives that $ s=0 $ and $ s=-1/2 $ which gives marginal stability, and for $ K>0 $, it gives that s has no roots in the RHP and ensures stability. so $ K>0 $ gives stability, which is justified by the graph.
     
     The key insight is that K adds phase lag, improving steady state performance
   \end{solution}
@@ -305,14 +315,45 @@ What are the poles of $P(s)$? What can you infer about the stability of the (ope
        Y(s) = \frac{C(s)P(s)} {1+P(s)C(s)}R(s) + \frac{P(s)} {1+P(s)C(s)} D(s)  
     \] 
 
-    We set $ R(s) =0$ because we dont care about reference when we allow for external disturbances in this case, because we want to examine how disturbances affects our equilibrium state. We also set $ D(s) = \frac{100} {s}  $ because it is a step function, and $ d=100 $   transformed to the laplace domain, we have that $ D(s)=\frac{100} {s}  $   
-    
-    so we have 
+    and our transfer function 
+
+    \[
+       \frac{Y(S)} {D(s)} = \frac{P(s)} {1 + P(s)C(s)} 
+    \] 
+
+    Substituting our plant and controller we get
 
     \begin{align*}
-      lim_{t \rightarrow \infty} s \frac{\frac{10} {1+s} } {1+\frac{10K} {s(s+1)} } * \frac{100} {s}  &= lim_{t \rightarrow \infty} \frac{1000s} {s^2+s+10K} \\
-      &= 0 
+      \frac{Y(s)} {D(s)} &=  \frac{\frac{10} {s+1} } {1+ \frac{10K} {s(s+1)} } \\
+      &= \frac{10} {s+1} * \frac{s(s+1)} {s(s+1) + 10K} \\
+      &= \frac{10s} {s^2 +s + 10K}  
     \end{align*}
+
+    Now we apply the final value theorem
+
+    \begin{align*}
+      y_{ss} &= lim_{s \rightarrow 0} s * Y(s) \\
+    \end{align*}
+
+    We know that $ Y(s) = \frac{P(s)} {1 + P(s)C(s)} * D(s) = \left( \frac{10s} {s^2+s+10K} \right) * \left( \frac{100} {s} \right)  $ 
+    
+    so we get 
+
+    \begin{align*}
+      y_{ss} &= lim_{s \rightarrow 0} s * Y(s) \\
+      &= lim_{s \rightarrow 0} s * \left( \frac{1000} {s^2+s+10K} \right)\\
+      &= lim_{s \rightarrow 0} \frac{1000s} {s^2+s+10K} \\
+      &= \frac{1000*0} {0+0+10K} \\
+      &= \frac{0} {10K} \\
+      &= 0   \\
+    \end{align*}
+    
+
+
+    We set $ R(s) =0$ because we dont care about reference when we allow for external disturbances in this case, because we want to examine how disturbances affects our equilibrium state. We also set $ D(s) = \frac{100} {s}  $ because it is a step function, and $ d=100 $   transformed to the laplace domain, we have that $ D(s)=\frac{100} {s}  $   
+
+    This result holds for any stable value $ K>0 $. It means that the feedback controller, which includes an integrator $ \frac{1} {S}  $ rejects the constant DC disturbance over time, driving the steady-state error to zero.  
+    
 
     
   \end{solution}
@@ -332,7 +373,7 @@ s^2 + 1}{
 \part Sketch the Nyquist plot of $P (s)$. Include correct asymptotes to infinity and to the origin.
 
 \begin{solution}
-  Include the figure for the nyquist plot for P(s)
+  The figure for the Nyquist curve for $ P(s) $ 
 
   \begin{center}
       \includegraphics[width=0.75\linewidth]{Figures/nyquist_fiveA.pdf}
@@ -373,7 +414,7 @@ s^2 + 1}{
   \[
      w(2-w^2) = 0
   \] 
-  Which gives that $w = 0$ or $w = \pm \sqrt{2}$. If we then plug $ w = 0 $ to the real part of $ L(jw) = 0 $, then we find that $ K=4 $. And doing the same for $ w = \pm \sqrt{2} $, we find that $ K=0 $ 
+  Which gives that $w = 0$ or $w = \pm \sqrt{2}$. Since two poles are located at the imaginary axis, we need to indent around them. If we then plug $ w = 0 $ to the real part of $ L(jw) = 0 $, then we find that $ K=4 $. And doing the same for $ w = \pm \sqrt{2} $, we find that $ K=0 $ 
   
 
   In order to indicate the number of encirclements and orientations of all possible critical points, we use the Nyquist stability criterion, which states that 
@@ -408,7 +449,7 @@ s^2 + 1}{
   \begin{itemize}
     \item $ K>4 $: Stability
     \item $ K=4 $: marginal stability
-    \item $ K \in (0,4) $: instability   
+    \item $ K \in (0,4) $: Unstability   
   \end{itemize} 
 
   We begin finding stability range by finding what solutions of 
@@ -568,7 +609,7 @@ Sketch the Nyquist plot of $PC$. How many encirclements are required of the crit
     &= \frac{K} {2-w^2} - j \left(\frac{2K} {w(2-w^2)} \right) 
   \end{align*}
 
-  This has no finite solutions for any rational $ w $, only as w approaches $ \infty $ which means that the system is stable for all $ K>0 $ $ \frac{-1} {K}  $ is then in the LHP    
+  This has no finite solutions for any rational $ w $, only as w approaches $ \infty $ which means that the system is stable for all $ K>0 $ and $ \frac{-1} {K}  $ is then in the LHP. Therefore, the feedback system is stable for all real gains $ K>0 $.     
 \end{solution}
 
 
