@@ -1,0 +1,186 @@
+\documentclass[12pt,A4, onecolumn]{exam}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage[lmargin=71pt, tmargin=1.2in]{geometry}  %For centering solution box
+\lhead{TEK4090 -- Introduction to Modern Control\\}
+\rhead{Assignment 2\\}
+% \chead{\hline} % Un-comment to draw line below header
+\thispagestyle{empty}   %For removing header/footer from page 1
+
+\usepackage{graphicx}
+\graphicspath{{../../figs/}}
+\epstopdfsetup{outdir=../../figs/}
+
+\def\showsoln{1}
+
+\begin{document}
+
+\begingroup  
+    \centering
+    \LARGE TEK4090 -- Introduction to Modern Control\\
+    \LARGE Assignment 2 v4.0\\[0.5em]
+    \large Due: October 23 2024, 13:15\\
+\endgroup
+\rule{\textwidth}{0.4pt}
+%\pointsdroppedatright   %Self-explanatory
+\printanswers
+
+
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}   %Replace "Ans:" with starting keyword in solution box
+
+\begin{questions}
+
+\begin{question}[10]
+  Consider the continuous-time system,
+  \begin{align}
+    \ddot x &= u\\
+    J(t_0) & = \dfrac{1}{2}x^2(0) + r\int_0^2 u^2dt.
+  \end{align}
+Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
+  \begin{parts}
+    \part Write the Hamilton-Jacobi-Bellman (HJB equation), eliminating $u(t)$ 
+
+    \begin{solution}
+      solution here
+    \end{solution}
+
+    \part Assume that the optimal cost-to-go function $J^*(t)$ is given by,
+      \begin{align}
+        J^*(t) = \dfrac{1}{2} s_1(t)x^2(t) + s_2 (t)x(t)\dot x(t) + \dfrac{1}{2} s_3 (t)\dot x^2 (t).
+      \end{align}
+      Use the HJB equation to derive coupled differential equations for these $s_i(t)$'s, and find boundary conditions for these equations.
+   \part Write the linear state feedback optimal control policy in terms of the $s_i(t)$'s. 
+  \end{parts}
+\end{question}
+
+\begin{solution}
+  \begin{parts}
+    \part 
+  \end{parts}
+\end{solution}
+
+\begin{question}[10]
+  Pick a system from a paper that you have found on a topic that you are interested in, potentially the topic you will choose for your final project.
+  \begin{parts}
+    \part What is/are the paper(s) you are drawing from?
+    \part What are the dynamics of the system in question? What are the inputs and outputs?
+    \part What is the system trying to achieve?
+    \part What are the challenges for the system?
+    \part What control tools can help the system overcome the challenges in achieving its goals?
+  \end{parts}
+\end{question}
+
+\begin{question}[20]
+  Suppose that $f:\mathbb{R}\mapsto \mathbb{R}$ is convex, and $a<b$ are in the domain of $f$.
+  \begin{parts}
+    \part Show that 
+      \begin{align}
+        f(x) \leq \dfrac{b-x}{b-a}f(a) + \dfrac{x-a}{b-a}f(b)
+      \end{align}
+      for all $x\in [a,b]$
+    \part Show that
+      \begin{align}
+        \dfrac{f(x)-f(a)}{x-a} \leq \dfrac{f(b) - f(a)}{b-a} \leq \dfrac{f(b) - f(x)}{b-x}
+      \end{align}
+      for all $x\in(a,b)$. 
+      Draw a sketch that illustrates this inequality
+    \part Suppose that $f$ is differentiable. Use the result in (b) to show that
+      \begin{align}
+        f'(a) \leq \dfrac{f(b) - f(a)}{b-a} \leq f'(b).
+      \end{align}
+    \part Suppose $f$ is twice differentiable. Use the result in (c) to show that $f''(a) \geq 0$ and $f''(b) \geq 0$.
+  \end{parts}
+\end{question}
+
+\begin{solution}
+  \begin{parts}
+    \part 
+  \end{parts}
+\end{solution}
+
+\begin{question}[20]
+  (LQR for Buildings)
+  Consider a multi-zone building as in Fig.~2.
+  \begin{center}
+    \includegraphics[width=0.5\linewidth]{./figures/building.png}\\
+    \textbf{Fig.~2:} Building model schematic
+  \end{center}
+  \begin{parts}
+  \part Write down the dynamical equations of the building in state-space form, including a term for disturbances $d(t)$, and for the ambient temperature $x_a(t)$, assuming the parameters are
+    \begin{align}
+      \frac{h_{ij}}{C_{i}} &= 
+      \begin{cases}
+        10  \text{ W/$^\circ$K}& \text{$i$ is adjacent to $j$}\\
+        0 & \text{else}
+      \end{cases}\\
+      C_i &= 1.08\times 10^6 \text{ J/$^\circ$K}
+    \end{align}
+    \part Consider an LQR cost function of the form
+      \begin{align}
+        \int_0^{T}\left[(x-\bar{x})^TQ(x-\bar{x}) + u^TRu\right]dt,
+      \end{align}
+      where $T=24\text{h}\times 60\frac{\text{m}}{\text{h}}\times 60\frac{\text{s}}{\text{m}} = 86400s$ is one day in seconds.
+      Set $\bar{x} = 20^\circ$, and write the dynamics in the coordinates
+      $z := x-\bar{x}$.
+    \part Note that driving the variable $z(t)\to 0$ is therefore equivalent to driving $x(t) \to 20^\circ$.
+      Write a \texttt{matlab} script to solve the finite-time horizon LQR problem. Select a positive semi-definite $Q$ and a positive-definite $R$ that gives you ``decent'' results. Assume the initial conditions, disturbance, and ambient temperature follow:
+      \begin{align}
+        x_i(0) &= 15 - i\times{\text{sign}\{(-1)^i\}}~~~[^\circ\text{ C}]\\
+        d(t) &= \max\left[0, 500\sin \left( \dfrac{2\pi t}{86400s} \right)-300\right]~~~[\text{W}]\\
+        x_a(t) &= 20^\circ+ 5\sin \left( \dfrac{2\pi t}{86400s} \right)~~~[^\circ\text{ C}]
+      \end{align}
+      where the sign function is:
+      \begin{align}
+        \text{sign}(x) = 
+        \begin{cases}
+          1 & x>0\\
+          -1 & x<0\\
+          0 & x=0.
+        \end{cases}
+      \end{align}
+    \textbf{Note:} If solving the finite-time problem proves too difficult, feel free to solve the infinite-time problem instead. \texttt{Matlab} has a built-in function called \texttt{lqr} that produces the (constant) gain $K$; read the documentation for details. 
+    \part Provide:
+      \begin{itemize}
+        \item A description of your simulation code
+        \item Plots of $d(t)$, $x_a(t)$, $x_i(t)$, and $u(t)$.
+        \item A discussion of the effects of varying $Q$ and $R$
+      \end{itemize}
+  \end{parts}
+
+\end{question}
+\begin{solution}
+  \begin{parts}
+    \part 
+  \end{parts}
+\end{solution}
+
+\begin{question}[10]
+
+Suppose that $Q=\mathbf{0}$, the zero matrix, and $R=I$.
+Prove that
+\begin{align}
+  x_0^TS_0x_0 = \min_{\{u_k\}_{k=0}^{T-1}}\sum_{k=0}^{T-1}\|u_k\|_2^2,
+\end{align}
+ meaning that $J_0=x_0^TS_0x_0$ is the minimum control energy required to drive the system to zero.
+  
+\end{question}
+\begin{solution}
+
+\end{solution}
+
+ \question[10] \textit{Crassidis \& Junkins} Problem 3.14
+\begin{solution}
+  
+\end{solution}   
+ \question[10] \textit{Crassidis \& Junkins} Problem 3.15
+\begin{solution}
+  
+\end{solution}
+ \question[10] \textit{Crassidis \& Junkins} Problem 7.4
+\begin{solution}
+  
+\end{solution}
+
+\end{questions}
+\end{document}

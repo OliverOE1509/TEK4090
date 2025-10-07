@@ -5,6 +5,10 @@
 \usepackage{mathtools} % For advanced math formatting (e.g., cases)
 \usepackage{geometry} % For adjustable margins
 \usepackage{graphicx}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{catchfile}
 \geometry{a4paper, margin=1in} % Set margins to 1 inch
 
 % ===== CUSTOM THEOREM ENVIRONMENTS =====
@@ -35,6 +39,8 @@
 
 \begin{document}
 \maketitle
+
+\tableofcontents
 
 \begin{abstract}
     A note on the book Feedback Systems
@@ -164,6 +170,278 @@ where
 Let n denite the number of poles of $ P(s)C(s) $ in $ 0 \leq Re(s) $. Construct the Nyquist plot of $ P(s)C(s) $, indenting to the right around poles on the imag. axis. Then the feedback system is stable iff the Nyquist plot \textbf{\textit{doesnt pass through $ \frac{-1} {K}  $ and encircles it exactly n times counterclockwise}}  
 
 So what range of K is the system stable then?
+
+
+
+\section{Optimal Control}
+
+In general we have a time invariant continuous system 
+
+\begin{align*}
+    \dot{x} &= Ax+bu \\
+    y &= Cx+Du
+\end{align*}
+    
+
+In standard control, we are trying to stabilize a system (or track a reference).  This means finding critial points of a transfer function and finding the number of encirclements of the Nyquist plot. Its not enough to find a stable system. We also want to find the optimal trajectory for our variables. \\
+
+\begin{example}
+    Lets say we have a system that changes lanes for our car. There are several ways a car can change lanes. 
+    
+    \[
+        \text{We have several parameters to track; fuel, time, comfort}    
+    \]
+    
+    The problem we are addressing with Optimal Control is: \\textbf{\textit{How do we choose the best control input such that we have the best control system?}}
+
+
+\end{example}
+
+
+
+Essentially, this is what we mean by finding a performance measure. What variable in our inputs do we want to optimize? \textbf{MULTIVARIABLE CALCULUS}¨
+
+Suppose we have the plant
+
+\begin{align*}
+    \dot{x}(t) = f(x(t), u(t), t), x(t_0)=x_0 \\
+    \text{And the cost function} \int_{t_0}^{t_1}L(x(t), u(t), t) dt + \phi(x(t_f))
+\end{align*}
+
+
+Where
+\begin{itemize}
+    \item L(*) measures the running cost of our system wrt to our input variables
+    \item $ \phi(*) $ measures the terminal cost, the error at the end to our reference value.
+\end{itemize}
+
+\textbf{\textit{The optimal control problem is to find the input $u^*(t)$ on the time interval $\left[t_0, T\right]$ that drives the plant (3.2-1) along a trajectory $x^*(t) $ such that the cost function  is minimized, and such that
+$\psi(x(T), T ) = 0$ for a given function $ \psi \in \mathbb{R}^p $ }}
+
+$ x(t) $ is the trajectory, $ x(T) $ is the terminal trajectory and $ \psi $ is the contraint (the $ g(x) $ for the final trajectory)    
+
+\subsection{Unconstrained optimization}
+
+\[
+    min_{x\in \mathbb{R}^n} f(x)
+\]
+
+where $ f: \mathbb{R}^n \rightarrow \mathbb{R} $
+
+$ x^* $ is the minimizer and $ f(x^*) $ is a minimum we want to find. If we have a finite definition set, we are bound to find at least one local minima of f. If $ f$ is globally convex on $ \mathbb{R}^n $ , we have a global minimum point.   
+
+
+\subsection{Constrained optimization}
+
+Want to optimize 
+
+\begin{align*}
+    min_{x\in \mathbb{R}^n} f(x) \text{ s.t. } g(x) =0
+\end{align*}
+
+where $ f:\mathbb{R}^n \rightarrow \mathbb{R} $ and $ g: \mathbb{R}^n \rightarrow \mathbb{R}^p$ 
+
+Think of lambda constraints. We have an equality constraint that arises such that
+
+\[
+    \mathcal{L}(x, \lambda) =  f(x) + \lambda^T g(x)
+\]
+
+For this equation to work, we have n lambdas. $ \lambda \in \mathbb{R}^n $ 
+
+To optimize we use the first order conditions (KKT) 
+
+\begin{itemize}
+    \item $\nabla \mathcal{L}(x^*, \lambda^*) = 0$
+    \item $g(x^*)=0$
+\end{itemize}
+
+
+Now we are bridging lagrangian equations to Optimal Control. We have a performance index. 
+
+\[
+    J = \phi(x(T), T) + \int_{t_0}^{T}L(x(t), u(t), t) dt
+\]
+
+subject to the constraints
+\[
+    \dot{x} = f(x(t), u(t), t) \text{ and } \phi(x(T), T) =0
+\]
+
+where $ \psi \in \mathbb{R}^p $. $ L(x,u) $ can be thougt of as the rate of cost for exerting control u in state x. And $ \phi $ can be thougt of as the cost of ending up at state x
+
+Our goal is to \textbf{\textit{MINIMIZE}} the performance index J. This is done by finding the input $ u^*(t) $ that drives the plant $ x^*(t) $ along a trajectory that minimizes J such that the constraint $ \psi(x(T), T) = 0 $   
+
+
+
+\subsubsection{Pontryagins maximum principle}
+
+Lev Pontryagin was developing this theory in 1956 working on rockets. It was derived using Bernoullis calculus of variations
+
+Consider an n dim dynamic system with state variable $ x \in \mathbb{R}^n $ and control variable $ u \in \mathcal{U} $. The evolution of the dynamic system is a function of x and u (the state and control),  according to the partial differential equation 
+
+\[
+    \dot{x} = f(x, u)
+\]
+
+The systems initial state is $ x_0 $ and has time interval $ \left[ 0, T \right]  $  
+
+The control trajectory is chosen to be $ u: \left[ 0, T \right] \rightarrow \mathcal{U} $. The objective is a functional defined by 
+
+\[
+    J = \psi(x(T), T) + \int_{0}^{T}L(x, u, t) dt
+\]
+
+Where L is the rate of cost of exerting control u in state x.
+
+
+The constrainst on the system dynamics come from the Lagrangian function $ \mathcal{L} $ by introducing time varying constraint vector $ \lambda(t) \in \mathbb{R}^n $, whose elements are called the costates of the system 
+
+
+
+This motivates the Hamiltonian. We now define the Hamtiltonian. It explores the KKT (first order conditions) for dynamic problems:
+
+\[
+    H(x, u, \lambda, t) = L(x, u, \lambda, t) + \lambda \left( t \right)^T f(x, u, t)
+\]
+
+Pontryagins minimum principle states that the optimal state trajectory $ x^* $, optimal control $ u^* $ and corresponding lagrange vector $ \lambda^* $  must minimize the Hamiltonian such that
+
+\[
+    H(x^*(t), u^*(t), \lambda^*(t), t) \leq H(x(t), u(t), \lambda(t), t)
+\]
+
+
+\begin{itemize}
+    \item $ \lambda(t)  $ \textbf{\textit{ The costate}}, and it enforces the dynamics constraint
+    \item $ \mu $ which is the terminal constraint. It enforces the terminal constraint
+\end{itemize}
+
+$ \lambda $ are the dual variables, if I nudge the state, $ \lambda $ tells me the impact
+
+
+In practice, the Pontryagin maximum principle comes from a set of equations
+
+\begin{itemize}
+    \item $\dot{x}^*(t) = \frac{\partial H}{\partial \lambda} (x^*, u^*, \lambda^*, t)$
+    \item $\dot{\lambda}^*(t) = - \frac{\partial H}{\partial x} (x^*, u^*, \lambda^*, t$
+    \item $\dot{u}^*(t) = argmin_{u\in \mathcal{U}} H(x^*, u^*, \lambda^*, t$
+\end{itemize}
+
+
+\subsubsection{Augmented performance index}
+
+We start with our optimization problem
+
+\[
+    J = \phi(x(T), T) + \int_{0}^{T}L(x, u, t) dt
+\]
+
+
+subject to the dynamics of 
+
+\[
+    \dot{x} = f(x, u, t)
+\]
+
+To enforce these constraints, we introduce time varying multipliers $ \lambda(t) $, the costates and form the agumented performance index. We now define the augmented performance index
+
+\[
+    \hat{J} = \phi(x(T), T) + \mu^T \psi(x(T), T) + \int_{t_0}^{T} \left[ L(x, u, t) + \lambda(t)^T \left( f(x, u, t) - \dot{x}(t) \right)   \right] dt
+\]
+
+This is the Lagrangian in Optimal Control, or in time varying dynamics
+
+
+To understand the difference between static and dynamic optimization, look no further
+
+
+
+
+
+NOTE:  COME BACK TO THIS LATER AS THIS WAS CONFUSING
+
+
+
+
+
+\subsection{Bellmans principle of optimality}
+
+\begin{definition}
+    Principle of optimality: An optimal policy has the property that, whatever the initial state and decision are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decision
+\end{definition}
+
+Put simply. Consider a network of nodes. You start at node 0 and end up at the optimal node N. You have an optimaly policy that is the "best path from node 0 to node N. Then for every subnode within that optimal policy, is also an optimal node. 
+
+\begin{example}
+    Travel from Oslo to Bergen. If Lillehammer is a part of the optimal path. Then from Lillehammer to bergen, you must find a new optimal path. So the new path becomes 
+
+    \begin{align*}
+        \text{Oslo} \rightarrow \text{Lillehammer} + \text{Better Lillehammer} \rightarrow \text{Bergen} 
+    \end{align*}
+    
+\end{example}
+
+
+\subsubsection{Idea of Dynamic programming}
+
+The algorithmic implementation of principle of optimality.
+
+
+A global problem. Break the problem into smaller sub-problems. Optimize over all those subproblems and move recursively backwards to the initial state
+
+
+\subsection{Continuous control and the Hamilton-Jacobi-Bellman equation}
+
+Suppose we have a plant 
+
+\[
+    \dot{x} = f(x, u, t)
+\]
+
+And it has a performance index of 
+
+\begin{align*}
+    J(x(t_0), t_0) = \phi(x(T), T) + \int_{t_0}^{T}L(x, u, t) dt
+\end{align*}
+
+Performance index is a cost functional telling you how well a control input performs, by combining accumulates running costs during the trajectory and the terminal cost at the final state. 
+
+
+We are interesting in finding the optimal control $ u^*(t) $ on $ \left[ t_0, T \right]  $  that optimizes J and drives the initial state $ x(t_0) $ to the final state satisfying $ \psi(x(T),T) = 0 $  
+
+
+\[
+    \psi: \mathbb{R}^n \rightarrow \mathbb{R}^p
+\]
+
+Think of $ \psi $ as the constraint function $ g(x) $ in the Lagrange equation  
+
+
+
+Now suppose we are travelling from state $x(t)$ to a small step ahead $x(t+\delta t)$. Then the cost to go $ J(x(t), t) $ can be written as 
+
+\begin{align*}
+    J(x(t), t) = \phi(x(t), t) + \int_{t+\delta t}^{T} L(x, u, \tau) d\tau + \int_{t}^{t+ \delta t} L(x, u, \tau) d\tau
+\end{align*}
+
+We looked at KKT and Pontryagin maximum principle. We have under this chapter looked at the value function way, or the HJB. The Hamiltonian Jacobian Bellman function way. These two approaches are equivalent but different approaches to finding the optimal $ u^* $ such that the state $ x(t) \rightarrow x^*(t) $ under the constraint $ \psi(x(T), T) $ 
+
+
+
+\section{Optimal estimation}
+
+Reading: Crassidis $ \& $ Junkins 
+\begin{itemize}
+    \item Kalman filters: 3.1-3.3
+    \item Spacecraft dynamics: 6.1 appendix A.7-A.8
+    \item Probability: Appendix C
+\end{itemize}
+
+\subsection{Reachability}
+
+
+
 
 
 
