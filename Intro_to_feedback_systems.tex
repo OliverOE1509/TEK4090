@@ -9,6 +9,7 @@
 \onehalfspacing
 
 \usepackage{catchfile}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue]{hyperref}
 \geometry{a4paper, margin=1in} % Set margins to 1 inch
 
 % ===== CUSTOM THEOREM ENVIRONMENTS =====
@@ -175,6 +176,94 @@ So what range of K is the system stable then?
 
 \section{Optimal Control}
 
+
+\subsection{Discrete time systems}
+
+
+\begin{example}[Discrete Linear Quadratic Regulator via dynamic programming]
+    We have a plant
+
+    \[
+        x_{k+1} = Ax_k + Bx_k
+    \]
+
+    have the associated cost funcional 
+
+    \[
+        J_i = \frac{ 1 }{ 2 } x_N^T S_N x_N + \frac{ 1 }{ 2 } \sum_{ k=1 }^{ N-1 } x_k^T Q x_k + u_k^T R u_k  
+    \]
+
+    with $ S_N \geq 0 $ and $ Q \geq 0 $  and $ R \ge 0 $. (positive semidefinite and positive definite). Our goal with the LQR is to find the optimal $ u_k^* $ on the fixed time interval $ \left[ i,N \right]  $ that minimizes $ J_i $. We solve this using the principle of optimality, we start from optimality and go back to find the minimum "cost to go"\\
+
+    \begin{definition}
+        \textbf{\textit{Cost to go}}: The cost it takes to get to the optimal finishing point.
+    \end{definition}
+
+    So to begin, let k=N and write
+
+    \[
+        J_N^* = \frac{ 1 }{ 2 } x_N^T S_N x_N
+    \]
+
+    Now decrement to $ N-1 $ and write 
+
+    \[
+        J_{N-1}^* = \frac{ 1 }{ 2 } x_{N-1}^T Q_{N-1} x_{N-1} + \frac{ 1 }{ 2 } u_{N-1}^T R_{N-1} u_{N-1} + \frac{ 1 }{ 2 } x_N^T S_N x_N
+    \]
+
+    We now need to find the $ u_{N-1}^* $ that minimizes the equation above. Do this by taking derivative. First we use the state equation at the beginning to rewrite the equation. We only switch $ x_N $ by the following:
+    
+    \[
+       x_{k+1} = Ax_k + Bx_k 
+    \]
+    
+    
+    \[
+        J_{N-1}^* = \frac{ 1 }{ 2 } x_{N-1}^T Q_{N-1} x_{N-1} + \frac{ 1 }{ 2 } u_{N-1}^T R_{N-1} u_{N-1} + \frac{ 1 }{ 2 } \left( Ax_{N-1} + Bx_{N-1} \right) ^T S_N \left( Ax_{N-1} + Bx_{N-1} \right)
+    \]
+
+
+    Since we have no constraints, just simply find 
+        
+        
+    \begin{align*}
+        0 &= \frac{ \del J_{N-1} }{ \del u_{N-1} } \\
+        &= Ru_{N-1} + B^T S_N \left( Ax_{N-1} + Bu_{N-1} \right) 
+    \end{align*}
+
+    Solving for optimal control yields
+
+    \begin{align*}
+        u_{N-1}^* = - \left( B^T S_N B + R \right) ^-1 B^T S_N Ax_{N-1}
+    \end{align*}
+
+
+    Defining the kalman gain as
+        
+    \[
+        K_{N-1} := \left( B^T S_N B + R \right) ^-1 B^T S_N A
+    \]
+
+    We can rewrite
+
+    \[
+        u_{N-1}^* := -K x_{N-1}
+    \]
+    
+    The optimal cost of going from N-1 to N is found by substituting $ u_{N-1}^* $ into 
+
+    \[
+        J_{N-1}^* = \frac{ 1 }{ 2 } x_{N-1}^T Q_{N-1} x_{N-1} + \frac{ 1 }{ 2 } u_{N-1}^T R_{N-1} u_{N-1} + \frac{ 1 }{ 2 } \left( Ax_{N-1} + Bx_{N-1} \right) ^T S_N \left( Ax_{N-1} + Bx_{N-1} \right)
+    \]
+    
+    
+    
+    
+\end{example}
+
+
+
+
 In general we have a time invariant continuous system 
 
 \begin{align*}
@@ -198,6 +287,17 @@ In standard control, we are trying to stabilize a system (or track a reference).
 \end{example}
 
 
+In general, optimal control is a division of control theory in which we seek to find an optimal control for a dynamical system over a period of time such that an objective function is optimized.
+
+\begin{example}
+    Another example is a dynamical system which is a rocket with thrusters as controls. We may seek to find a trajectory to Mars that minimizes thrust consumption
+\end{example}
+
+\begin{example}
+    Or consider a nations economy as the dynamical system, with the objective to minimize unemployment. The controls here could be fiscal and monetary policy
+\end{example}
+
+
 
 Essentially, this is what we mean by finding a performance measure. What variable in our inputs do we want to optimize? \textbf{MULTIVARIABLE CALCULUS}¨
 
@@ -218,7 +318,20 @@ Where
 \textbf{\textit{The optimal control problem is to find the input $u^*(t)$ on the time interval $\left[t_0, T\right]$ that drives the plant (3.2-1) along a trajectory $x^*(t) $ such that the cost function  is minimized, and such that
 $\psi(x(T), T ) = 0$ for a given function $ \psi \in \mathbb{R}^p $ }}
 
-$ x(t) $ is the trajectory, $ x(T) $ is the terminal trajectory and $ \psi $ is the contraint (the $ g(x) $ for the final trajectory)    
+$ x(t) $ is the trajectory, $ x(T) $ is the terminal trajectory and $ \psi $ is the contraint (the $ g(x) $ for the final trajectory)  
+
+
+\subsection{Two approaches (CoV \& DP)}
+
+We have two approaches for finding the optimal values for penalizing and optimizing our control. Optimal control is largely an extension of calculus of variations, and is a mathematical optimization technique for deriving optimal control policies
+
+\begin{enumerate}
+    \item \textbf{\textit{Calculus of variations - }} This is the classical optimization derived from calculus. We find extremum points of our functional that maps from a definition domain to our real numbers.
+    \item \textbf{\textit{Dynamic programming - }}This is a relatively new approach that was founded in the 1950s by Bellman and Dreyfus. Here we use Bellmans principle of optimality and such.
+\end{enumerate}
+
+
+
 
 \subsection{Unconstrained optimization}
 
