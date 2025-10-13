@@ -1,0 +1,46 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.18337018634364283 -0.17895335475646146 -0.9666183691518105 3.947371344057027
+  position 46.56966653586571 -46.994862502521386 31.404484397833365
+}
+Solid {
+  name "solid(1)"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Solid {
+  translation 0 1 2
+  rotation 0 0 1 -2.094395307179586
+  children [
+    DEF Ball Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+        roughnessMap ImageTexture {
+          url [
+            ""
+          ]
+          filtering 2
+        }
+        metalness 0
+        emissiveColorMap ImageTexture {
+        }
+      }
+      geometry Sphere {
+        radius 1.4
+        subdivision 5
+      }
+    }
+  ]
+  boundingObject USE Ball
+  physics Physics {
+  }
+}

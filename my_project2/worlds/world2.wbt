@@ -1,0 +1,42 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.3382464060919973 0.03462863565742315 0.9404202392326279 2.79824034005073
+  position 6.495320366452325 -2.625359215581022 5.748279811915302
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 5 5
+}
+Solid {
+  translation 0 1 1
+  children [
+    DEF ball Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Sphere {
+        radius 0.1
+        subdivision 5
+      }
+    }
+  ]
+  boundingObject USE ball
+  physics Physics {
+  }
+}
+E-puck {
+  translation 0 1 0
+}

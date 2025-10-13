@@ -1,0 +1,59 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.19086811458144745 0.09332742226243569 0.9771690514388861 2.250147652193891
+  position 1.103546670667757 -0.962161432281034 0.7649275554523572
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+}
+Robot {
+  children [
+    DEF Body Transform {
+      translation 0 0 0.0415
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 1
+            roughness 1
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.08
+            radius 0.045
+          }
+        }
+      ]
+    }
+    USE Body
+    HingeJoint {
+      jointParameters HingeJointParameters {
+      }
+      device [
+        DEF motor1 RotationalMotor {
+        }
+      ]
+      endPoint Solid {
+        translation 0.045 0 0.1
+        rotation 0 1 0 1.57
+        children [
+          Shape {
+            geometry Cylinder {
+              height 0.01
+              radius 0.025
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

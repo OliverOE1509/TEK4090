@@ -1,0 +1,25 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.3130645129846962 0.1091251432428568 0.9434417384353319 2.506170161366755
+  position 2.8569032060079245 -2.4161974592643736 3.2637302093352503
+}
+TexturedBackground {
+  texture "music_hall"
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 5 5
+}
+Mavic2Pro {
+  translation 0 0 0.1
+  controller "drone_controller"
+}
