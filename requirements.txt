@@ -1,3 +1,5 @@
 controller
 numpy
 matplotlib
+scipy
+
