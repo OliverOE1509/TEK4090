@@ -1,0 +1,115 @@
+%%
+
+clear; close all; clc;
+d = tf('d');
+C = (s^2+1) / ((s-1))
+
+
+H = tf(num, dem);
+closedLoopSystem = feedback(H,1);
+nyquist(H);
+grid on;
+
+class(closedLoopSystem)
+%%
+
+% nyquist_demo.m
+% Illustrate Nyquist encirclement and root-locus for:
+% P(s) = (s^2+1)/((s^2+2)*(s-2)), L(s)=K*P(s)
+% Shows Nyquist (positive+negative freqs), marks -1/K, computes winding number.
+
+clear; close all; clc;
+
+% Transfer function P(s)
+s = tf('s');
+P = (s^2+1)/((s^2+2)*(s-2));
+
+% Frequency vector (avoid exact omega = sqrt(2) where plant has i*sqrt(2) pole)
+omega0 = sqrt(2);
+% build positive freqs with fine grid, skip a small neighborhood around omega0
+w1 = linspace(0, omega0-1e-3, 2000);
+w2 = linspace(omega0+1e-3, 200, 20000); % extend to high freq to see approach to origin
+wpos = [w1, w2];
+% compute P(jw) on positive freqs
+Pjw_pos = squeeze(freqresp(P, wpos));
+
+% build full Nyquist curve: positive freq then mirror negative freq (conjugate)
+% For plotting and winding number we form a closed curve
+Pcurve = [Pjw_pos.' , conj(flipud(Pjw_pos)).']; % will concatenate columns; we'll unwrap next
+Pcurve = [Pjw_pos(:); conj(flipud(Pjw_pos(:)))]; % column vector: positive then mirrored negative
+
+% Prepare figure: Nyquist plot of P(jw)
+figure('Position',[200 200 900 400]);
+subplot(1,2,1);
+plot(real(Pcurve), imag(Pcurve), 'b-', 'LineWidth', 1.2); hold on;
+plot(real(Pcurve(1)), imag(Pcurve(1)), 'bo', 'MarkerFaceColor','b'); % start
+grid on; axis equal;
+xlabel('Re'); ylabel('Im'); title('Nyquist plot of P(j\omega) (full contour)');
+plot(real(-0.25), imag(0), 'ks', 'MarkerFaceColor','k'); text(-0.25,0,'  P(j0)=-0.25');
+
+% Draw -1 point
+plot(-1,0,'rx','MarkerSize',10,'LineWidth',2); text(-1,0,'  -1');
+
+% Choose K values to inspect
+Kvals = [0.1, 1, 2, 4, 10];
+
+% Colors for markers
+cols = lines(length(Kvals));
+
+% Function to compute winding number (numerical)
+winding_number = @(curve, z) compute_winding(curve, z);
+
+% Plot -1/K for each K and compute winding around -1 (we want encirclements of -1)
+legendEntries = {'P(j\omega)'};
+for k = 1:length(Kvals)
+    K = Kvals(k);
+    % point to check: -1/K in complex plane
+    if K==0
+        continue; % -1/K undefined
+    end
+    pt = -1/K;
+    plot(real(pt), imag(pt), 'o', 'MarkerEdgeColor', cols(k,:), 'MarkerFaceColor', cols(k,:), 'MarkerSize',8);
+    text(real(pt), imag(pt), sprintf('  -1/%g',K));
+    
+    % Determine encirclement of Nyquist curve of L(s)=K*P(s) around -1.
+    % Equivalent to winding of Pcurve around -1/K: check winding(Pcurve, -1/K)
+    wnum = winding_number(Pcurve, pt);
+    fprintf('K = %g: winding around -1/K = %d  -> Nyquist encirclements of -1 (for L=K*P) = %d\n', K, wnum, wnum);
+end
+
+% Now compute winding of Pcurve around the point -1 (to infer N for each K differently):
+% For each K, the Nyquist of L(s)=K*P(s) encircles -1 N times iff Pcurve encircles -1/K N times.
+subplot(1,2,2);
+plot(real(Pcurve), imag(Pcurve), 'b-','LineWidth',1.2); hold on;
+plot(-1,0,'rx','MarkerSize',10,'LineWidth',2); text(-1,0,'  -1');
+grid on; axis equal; xlabel('Re'); ylabel('Im'); title('Nyquist with -1 and -1/K markers');
+for k = 1:length(Kvals)
+    K = Kvals(k);
+    if K==0, continue; end
+    pt = -1/K;
+    plot(real(pt), imag(pt), 'o', 'MarkerFaceColor', cols(k,:), 'MarkerEdgeColor', cols(k,:));
+    text(real(pt), imag(pt), sprintf('  -1/%g',K));
+end
+
+% Root locus plot to see pole movement and crossings at K=0 and K=4
+figure('Position',[200 200 600 500]);
+rlocus(P); title('Root-Locus of P(s) (closed-loop poles of 1+K P(s)=0)'); grid on;
+% mark K=0 and K=4 closed-loop poles explicitly by solving polynomial
+Ks_to_check = [0, 4];
+for K = Ks_to_check
+    cl_poles = pole(feedback(K*P,1));
+    plot(real(cl_poles), imag(cl_poles), 'x','MarkerSize',10,'LineWidth',2);
+    text(real(cl_poles)+0.05, imag(cl_poles), sprintf(' K=%g',K));
+end
+
+% --- Helper function: compute winding number of a closed curve around a point z --
+function W = compute_winding(curve, z)
+    % curve: column vector of complex points forming a closed curve (first and last need not be equal)
+    % z: complex point
+    % returns integer winding number around z (positive = CCW)
+    zc = curve(:) - z;
+    % compute incremental angles
+    ang = angle(zc);
+    diffang = diff(unwrap(ang));
+    W = round(sum(diffang)/(2*pi)); % rounding to nearest integer
+end

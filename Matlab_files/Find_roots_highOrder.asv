@@ -1,0 +1,17 @@
+nC = [1];
+dC = [1,0];
+
+nP= [1,1];
+dP = [1,-4,13];
+
+numProd = conv(nD, nC);
+denProd = conv(dC, dD);
+
+ml = max(length(denProd), length(num_product));
+denProd_padded = [zeros(1, ml - length(denProd)), denProd];
+num_product_padded = [zeros(1, ml - length(num_product)), num_product];
+
+char_poly = denProd_padded + num_product_padded;
+
+r = roots(char_poly);
+disp(r)

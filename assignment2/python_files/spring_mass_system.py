@@ -3,6 +3,32 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy.integrate import solve_ivp
 
+
+
+class SpringMassSystem:
+    def __init__(self, mass, spring_constant, damping=0.0):
+        self.m = mass
+        self.k = spring_constant
+        self.c = damping  # damping coefficient
+    
+    def equation_of_motion(self, t, state):
+        """
+        state = [position, velocity]
+        Returns derivatives: [velocity, acceleration]
+        """
+        x, v = state
+        acceleration = (-self.k * x - self.c * v) / self.m
+        return [v, acceleration]
+    
+    def solve(self, initial_conditions, t_span, t_eval=None):
+        """
+        Solve the system with given initial conditions
+        initial_conditions = [initial_position, initial_velocity]
+        """
+        solution = solve_ivp(self.equation_of_motion, t_span, 
+                           initial_conditions, t_eval=t_eval)
+        return solution
+
 class AnimatedSpringMass:
     def __init__(self, mass, spring_constant, damping=0.0):
         self.system = SpringMassSystem(mass, spring_constant, damping)
@@ -59,5 +85,5 @@ class AnimatedSpringMass:
         return self.spring_line, self.mass_point, self.trajectory
 
 # Create and run animation
-animator = AnimatedSpringMass(mass=1.0, spring_constant=10.0, damping=0.1)
+animator = AnimatedSpringMass(mass=0.5, spring_constant=20.0, damping=10.0)
 animation = animator.animate([1.0, 0.0], (0, 10), num_frames=200)

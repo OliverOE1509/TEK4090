@@ -8,6 +8,8 @@
 % \chead{\hline} % Un-comment to draw line below header
 \thispagestyle{empty}   %For removing header/footer from page 1
 
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \usepackage{gensymb}
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -329,7 +331,7 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     To find the dynamical equations of the building in state-space form,  we have to find the system on the form
 
     \[
-        \dot{x} =Ax+Bu, y = Cx+Du
+        \dot{x} =Ax+Bu, y = Cx
     \]
 
     The individual room equations are 
@@ -364,6 +366,12 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
             d_4(t)\\
             d_5(t)
         \end{bmatrix}$
+
+    We incorporate the disturbance term, ambient temperatures and the controls (radiators) into a single vector $ u^* = \begin{bmatrix}
+        u\\
+        d\\
+        x_a
+    \end{bmatrix}  $ 
     
     $ \frac{ h_{ij} }{ C_i } = \begin{cases}
       10 W/\degree K\text{, if i adjacent to j}\\
@@ -432,7 +440,7 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     
     For this problem, we note that $ z = x-\bar{x} $, then $ x = z + \bar{x} $ and $ \dot{x}= \dot{z} $ since $ \bar{x} $ is a constant temperature of $ 20 \degree C \approx 293 \degree K$ since $ 1\degree C  = 1K$ (K $ = $  Kelvin)     
 
-    so we get the dynamics in thez coordinates as 
+    so we get the dynamics in the z coordinates as 
 
     \begin{align*}
       \dot{z} &= A \left( z+ \bar{x} \right) + Bu \\
@@ -445,9 +453,122 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
 
     Solving the finite-time horizon problem seems to me very hard, as we dont have any initial points to work backwards from. So I just used the infinite-time horizon
 
+    I will attach the matlab script below. From experimenting, I see that a larger value of Q on the diagonals, makes the system more stable, and temperatures in all rooms converge to 20 degrees. Moderate R values allow for moderate control, without spending too much energy. For large values on the diagonal of Q, we prioritize error tracking accuracy. This leads to smaller steady state errors. Values Can go as far as $ 1000 $ 
+
+    For the R matrix, we should have smaller values, as far down as $ 100 $. What this leads to, is sufficient control action. It means that we dont overdo control, and dont underdo, such that we dont oscillate the control effort. 
+
+    We see that the Q and R values become weights that account for how important we want to optimize different parts of our system
+
 
     
+    
+    \part
 
+    The plant system from the exercise, $ \dot{x} = Ax + Bu $, $ y = Cx $. From b), we got that $ \dot{z} = Az + A\bar{x} + Bu $. Because of the disturbance terms, we have several terms to include
+    
+    $ B_d = \begin{bmatrix}
+        1.08 \times 10^-6 & 0 &0&0&0\\
+        0& 1.08 \times 10^-6&0&0&0\\
+        0&0&1.08 \times 10^-6&0&0\\
+        0&0&0&1.08 \times 10^-6&0\\
+        0&0&0&0&1.08 \times 10^-6
+    \end{bmatrix}  $ and $ B_u = \begin{bmatrix}
+        1.08 \times 10^-6 &0&0\\
+        0&1.08 \times 10^-6&0\\
+        0&0&0\\
+        0&0&1.08 \times 10^-6\\
+        0&0&0
+    \end{bmatrix}  $  
+    and finally $ B_a= \begin{bmatrix}
+        10\\
+        10\\
+        10\\
+        10\\
+        10
+    \end{bmatrix}  $ 
+
+    We are. then allowed to rewrite our system as 
+
+    $ \dot{z} = Az + A\bar{x} + B_d d + B_a x_a  $\\
+    $ \dot{z} = Az+ B_u u^*  + B_d d + \begin{bmatrix}
+        10\\
+        10\\
+        10\\
+        10\\
+        10
+    \end{bmatrix} \left( 293 + 5 \sin \left( \frac{ 2\pi t }{ 86400s } \right)  \right) - 293 * \begin{bmatrix}
+        10\\
+        10\\
+        10\\
+        10\\
+        10
+    \end{bmatrix}  $  \\
+    $ \dot{z} = Az+ B_u u^*  +B_d d + \begin{bmatrix}
+        10\\
+        10\\
+        10\\
+        10\\
+        10
+    \end{bmatrix} * 5sin \left( \frac{ 2\pi t }{ 86400s } \right) $ 
+
+    The formula for the initial conditional temperature in all 5 rooms is provided, and in degrees they are $ \left( 17, 13, 18, 11, 20 \right)  $ and in z coordinates, they are $ \left( -4, -7, -2, -9, 0 \right)$
+    
+    
+    For the LQR system design, I use the lqr function with 
+    $ Q = I*q $ and $ R = I*r $. The difference $ \left( q-r \right) $ indicates if I favor tracking errors or control effort of the radiators more. In my case, with $ q=1e6 $ and $ r=1e2 $, the balance is $ \frac{ q }{ r }=1000 $. 
+    
+    For observer design, we must check that the system is observable. The LQR controller $ u=-K z $ requires full state knowledge.  With only two temperature measurements in two rooms, we need full state observability over all the states $ \left( z \right) _i^{1 to 5} $. We have the true system $ \dot{z} = Az + Bu +\text{disturbance term} $, and in parallell, we have a observer running $ \dot{z} = Az + Bu + L(y - C\hat{z} $   
+
+    To derive the augmented matrix, we have the true state dynamic $ \dot{z} = Ax + Bu + B_{ext} w $ where $ w = \begin{bmatrix}
+        d\\
+        x_a
+    \end{bmatrix}  $  
+    The observer dynamics is defined as 
+    
+    \begin{align*}
+      \frac{ d\hat{z} }{ dt } &= A\hat{z} + Bu + L \left( Cz - C\hat{z} \right)\\
+      &= \hat{z} \left( A-LC \right) + Bu + LCz
+    \end{align*}
+
+    The control using the estimates is 
+    
+    \[
+        u = -K \hat{z}
+    \]
+    Substituting this to the true dynamics gives 
+    \[
+        \dot{z} = Ax + B \left( -K\hat{z} \right) + B_{ext} w
+    \]
+
+    Also substituting into the observer,
+
+    \[
+        \frac{ d\hat{z} }{ dt } = LCz + \left( A-LC \right) \hat{z} -BK\hat{z}
+    \]
+    
+    And now pulling it into matrix form we get 
+
+    \[
+        A_{aug} = \begin{bmatrix}
+            A&-B_u K\\
+            LC&A-B_uK-LC
+        \end{bmatrix} 
+    \]
+    
+    Now \begin{itemize}
+      \item $ A_{aug} $ is a $ 10\times 10 $ matrix
+      \item $ B_{aug} $ is a $ 10 \times 6 $ matrix
+      \item $ z_{aug} $ is a $ 10 \times 1 $ matrix    
+    \end{itemize}  
+
+    Now the plot looks like this, and it should include everything demanded
+    
+    \begin{center}
+    \includegraphics[width=0.5\linewidth]{./figures/Exc_4c_bigQ_smallR.pdf}\\
+    \textbf{Fig.~2:} Building model schematic
+    \end{center}
+
+  
   \end{parts}
 \end{solution}
 
@@ -462,11 +583,68 @@ Prove that
   
 \end{question}
 \begin{solution}
+  We have the discrete LQR with dynamic programming, and an associated cost index
+
+  \[
+      J_i = x_N^TS_nx_N + \sum_{ k=i }^{ N-1 } \left( x_k^TQx_k + u_k^TRu_k \right)  
+  \]
+  
+  we are given that $ Q=0 $ and $ R=I $. Then we get the cost index 
+  
+  \[
+      J_i = x_N^TS_nx_N + \sum_{ k=i }^{ N-1 } u_k^Tu_k
+  \]
+  We want to find the control sequence $ u^* $ that minimizes the cost function $ J_i $. So our problem is the optimization problem 
+  $$ J_0^* = min_u J_o(u) $$\\
+  s.t. $ x_{k+1} = Ax_k + Bu_k $. This is largely already proved on page 270-271 in Optimal Control by Lewis, but I will show the main results. We will have big help of the principle of optimality,  which states that along the optimal path, any subpath along that trajectory, is also an optimal trajectory.
+  
+  So we have that $ J_N^* = x_N^T S_N x_N $. Now decrement to N-1 and get $ J_{N-1} = u_{N-1}^Tu_{N-1} + x_N^TS_N x_N $ and substitute in $ x_{k+1} = Ax_k + Bu_k $.
+
+  \[
+      J_{N-1} = u_{N-1}^Tu_{N-1} + \left( Ax_{N-1} + Bu_{N-1} \right) ^TS_N \left( Ax_{N-1} + Bu_{N-1} \right)  
+  \]
+  Now we optimize, and since the cost function is convex, we know we find the minimum when $ \frac{ \partial J_{N-1} }{ \partial u } = 0 = u_{N-1} + B^T S_N \left( Ax_{N-1} + Bu_{N-1} \right)  $ and get
+
+  \begin{align*}
+    0 &= u_{N-1} + B^T S_N Ax_{N-1} + B^T S_N Bu_{N-1} \\
+    &= u_{N-1} \left( I + B^TS_NB \right) + B^TS_N Ax_{N-1} \\
+    u_{N-1}^* &= -\left( I + B^TS_NB \right)^{-1} + B^TS_N Ax_{N-1}
+  \end{align*}
+
+  If we now define the gain as 
+
+  \[
+      K = -\left( I + B^TS_NB \right)^{-1} + B^TS_N A
+  \]
+
+  we get that \[
+      u_{N-1}^* := K_{N-1} x_{N-1} 
+  \]
+  which is the optimal cost to go from step number $ N-1 $. We can go recursively back and find that 
+  
+\begin{align*}
+  J_0^* &= x_0^TS_0x_0\\
+  &= x_N^TS_Nx_N  + \sum_{ k=0 }^{ N-1 } (u_k^*)^T u_k^*\\
+  &= \sum_{ k=0}^{ N-1 } \norm{u_k^*}_{2}^{2}
+\end{align*}
+
+Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
+
+\[
+    x_0^TS_0x_0 = min_u \sum_{ k=0 }^{ N-1 } \norm{u_k}_{2}^{2} 
+\]
+
+
+  
+  
+  
+  
 
 \end{solution}
 
  \question[10] \textit{Crassidis \& Junkins} Problem 3.14
 \begin{solution}
+
   
 \end{solution}   
  \question[10] \textit{Crassidis \& Junkins} Problem 3.15
