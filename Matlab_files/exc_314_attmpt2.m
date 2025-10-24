@@ -1,0 +1,224 @@
+clear all; close all; clc;
+
+A = [9.9985 * 10^-1, 9.8510 * 10^-3;
+    -2.9553 * 10^-2, 9.7030 * 10^-1];
+B = [4.9502 * 10^-5;
+    9.8510 * 10^-3];
+
+H = [1, 0];  
+
+Q = 1;
+R = 0.01;
+N = 1001;
+dt = 0.01;
+time = (0:N-1)' * dt;
+
+x0_true = [1; 1];
+
+% Generate synthetic data
+rng(42);
+w = sqrt(Q) * randn(N,1);
+v = sqrt(R) * randn(N,1);
+x_true = zeros(2, N);
+x_true(:,1) = x0_true;
+
+for k = 1:N-1
+    x_true(:,k+1) = A * x_true(:,k) + B * w(k);
+end
+
+y_meas = H * x_true + v';
+
+% Improved Kalman filter function (fixed initialization)
+function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
+    runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
+    
+    x_hat_minus = zeros(2, N);
+    x_hat_plus = zeros(2, N);
+    P_minus = zeros(2,2,N);
+    P_plus = zeros(2,2,N);
+
+    % Proper initialization (FIXED)
+    x_hat_minus(:,1) = x_hat0_minus;
+    P_minus(:,:,1) = P0_minus;  % Corrected assignment
+    
+    for k = 1:N
+        % Update step
+        Kk = P_minus(:,:,k) * H' / (H * P_minus(:,:,k) * H' + R);
+        x_hat_plus(:,k) = x_hat_minus(:,k) + Kk * (y_meas(k) - H * x_hat_minus(:,k));
+        P_plus(:,:,k) = (eye(2) - Kk * H) * P_minus(:,:,k);
+
+        % Propagation step (except for last iteration)
+        if k < N
+            x_hat_minus(:,k+1) = A * x_hat_plus(:,k);
+            P_minus(:,:,k+1) = A * P_plus(:,:,k) * A' + B * Q * B';
+        end
+    end
+end
+
+%% Test different initial conditions (as in assignment)
+fprintf('Running Kalman filter with different initial conditions...\n');
+
+% Case 1: Initial state [0,0], P0 = [0 0; 0 0] (overconfident wrong)
+[x_hat_plus_1, P_plus_1] = runKalmanFilter(A, B, H, Q, R, y_meas, [1000;1000], [20 20; 20 20], N);
+
+% Case 2: Initial state [1,1], P0 = [0.01 0.01; 0.01 0.01] (good state, moderate uncertainty)
+[x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [1;1], [0.01 0.01; 0.01 0.01], N);
+
+% Case 3: Initial state [100,100], P0 = [1 1; 1 1] (bad state, high uncertainty)
+[x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [100;100], [1 1; 1 1], N);
+
+% Calculate errors
+error_1 = x_true - x_hat_plus_1;
+error_2 = x_true - x_hat_plus_2;
+error_3 = x_true - x_hat_plus_3;
+
+% Calculate Euclidean distances
+dist1 = sqrt(sum(error_1.^2, 1));
+dist2 = sqrt(sum(error_2.^2, 1));
+dist3 = sqrt(sum(error_3.^2, 1));
+
+% Plot Euclidean distances (as in assignment)
+figure;
+plot(time, dist1, 'r-', 'LineWidth', 1.5); hold on;
+plot(time, dist2, 'g-', 'LineWidth', 1.5);
+plot(time, dist3, 'b-', 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Euclidean Distance');
+title('Distance Between True and Estimated State');
+legend('Case 1: x0=[0,0], P0=0', 'Case 2: x0=[1,1], P0=0.01I', 'Case 3: x0=[100,100], P0=I', 'Location', 'best');
+grid on;
+
+return
+
+%% Plot state errors with 3σ bounds for all cases
+figure('Position', [100, 100, 1200, 800]);
+
+% Case 1 - State 1
+subplot(3,2,1);
+sigma_bounds_1_state1 = 3 * squeeze(sqrt(P_plus_1(1,1,:)));
+plot(time, error_1(1,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 1: State 1 Error (x0=[0,0], P0=0)');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 1 - State 2
+subplot(3,2,2);
+sigma_bounds_1_state2 = 3 * squeeze(sqrt(P_plus_1(2,2,:)));
+plot(time, error_1(2,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_1_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state2, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 1: State 2 Error (x0=[0,0], P0=0)');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 2 - State 1
+subplot(3,2,3);
+sigma_bounds_2_state1 = 3 * squeeze(sqrt(P_plus_2(1,1,:)));
+plot(time, error_2(1,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_2_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_2_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 2: State 1 Error (x0=[1,1], P0=0.01I)');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 2 - State 2
+subplot(3,2,4);
+sigma_bounds_2_state2 = 3 * squeeze(sqrt(P_plus_2(2,2,:)));
+plot(time, error_2(2,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_2_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_2_state2, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 2: State 2 Error (x0=[1,1], P0=0.01I)');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 3 - State 1
+subplot(3,2,5);
+sigma_bounds_3_state1 = 3 * squeeze(sqrt(P_plus_3(1,1,:)));
+plot(time, error_3(1,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_3_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_3_state1, 'r--', 'LineWidth', 1);
+xlabel('Time (s)'); ylabel('Error');
+title('Case 3: State 1 Error (x0=[100,100], P0=I)');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 3 - State 2
+subplot(3,2,6);
+sigma_bounds_3_state2 = 3 * squeeze(sqrt(P_plus_3(2,2,:)));
+plot(time, error_3(2,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+xlabel('Time (s)'); ylabel('Error');
+title('Case 3: State 2 Error (x0=[100,100], P0=I)');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+sgtitle('Kalman Filter Estimation Errors with 3σ Bounds');
+
+%% Enhanced Convergence Analysis
+fprintf('\n=== Enhanced Convergence Analysis ===\n');
+
+cases = {error_1, error_2, error_3};
+P_cases = {P_plus_1, P_plus_2, P_plus_3};
+case_names = {'Case 1: x0=[0,0], P0=0', 'Case 2: x0=[1,1], P0=0.01I', 'Case 3: x0=[100,100], P0=I'};
+
+for i = 1:3
+    error = cases{i};
+    P_plus = P_cases{i};
+    
+    % Calculate 3σ bounds
+    sigma_bounds_state1 = 3 * squeeze(sqrt(P_plus(1,1,:)));
+    sigma_bounds_state2 = 3 * squeeze(sqrt(P_plus(2,2,:)));
+    
+    % Check if errors are within 3σ bounds (after initial transient)
+    steady_state_start = 501;
+    
+    % State 1
+    within_bounds_state1 = sum(abs(error(1, steady_state_start:end)) <= sigma_bounds_state1(steady_state_start:end)');
+    percentage_state1 = within_bounds_state1 / (N - steady_state_start + 1) * 100;
+    
+    % State 2
+    within_bounds_state2 = sum(abs(error(2, steady_state_start:end)) <= sigma_bounds_state2(steady_state_start:end)');
+    percentage_state2 = within_bounds_state2 / (N - steady_state_start + 1) * 100;
+    
+    % Final errors
+    final_error_state1 = abs(error(1, end));
+    final_error_state2 = abs(error(2, end));
+    
+    fprintf('%s:\n', case_names{i});
+    fprintf('  State 1: %.2f%% of errors within 3σ bounds, Final error: %.4f\n', percentage_state1, final_error_state1);
+    fprintf('  State 2: %.2f%% of errors within 3σ bounds, Final error: %.4f\n', percentage_state2, final_error_state2);
+    
+    % Convergence time (error < 0.1)
+    convergence_threshold = 0.1;
+    converged_idx = find(all(abs(error) < convergence_threshold, 1), 1);
+    if ~isempty(converged_idx)
+        fprintf('  Converged to error < 0.1 at %.2f seconds\n', time(converged_idx));
+    else
+        fprintf('  Did not converge to error < 0.1 within simulation time\n');
+    end
+    fprintf('\n');
+end
+
+%% Display System Information
+fprintf('=== System Information ===\n');
+fprintf('Sampling interval: %.3f s\n', dt);
+fprintf('Simulation duration: %.1f s\n', time(end));
+fprintf('Process noise variance Q: %.2f\n', Q);
+fprintf('Measurement noise variance R: %.4f\n', R);
+eigenvalues = eig(A);
+fprintf('Eigenvalues of A: %.4f, %.4f\n', eigenvalues(1), eigenvalues(2));
+
+% Fixed the ternary operator - using if-else instead
+if all(abs(eigenvalues) < 1)
+    stability = 'Stable';
+else
+    stability = 'Unstable';
+end
+fprintf('System stability: %s\n', stability);

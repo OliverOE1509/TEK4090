@@ -633,9 +633,6 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
 \[
     x_0^TS_0x_0 = min_u \sum_{ k=0 }^{ N-1 } \norm{u_k}_{2}^{2} 
 \]
-
-
-  
   
   
   
@@ -644,16 +641,72 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
 
  \question[10] \textit{Crassidis \& Junkins} Problem 3.14
 \begin{solution}
+  In this problem, we can imagine we have sensors, and an idea of where we are. The problem is to analyze the difference between what state we think we are in, and the true state. We use two different parameters to analyze the different cases. The initial conditions and the covariance matrix. The initial condition means where we think we are, and the covariance matrix means how sure we are of that. A covariance matrix with 0 as elements, means we are absolutely sure we are in the proper initial condition. So if the distance between the true state and the measured state is 
+  \[
+     \norm{x_{true} - x_{hat}}_{}^{} = c
+  \] 
 
+  Then the speed that c converges to 0, will be determined by the covariance matrix itself.
+
+  Here is the plot that shows the distance in norms for several initial conditions and covariance matrices.
+
+  \begin{center}
+  \includegraphics[width=0.75\linewidth]{figures/kalman_filter_plot_norms.pdf}
+  \end{center}
+  And here is the plot that shows the 3sigma bounds
+  \begin{center}
+  \includegraphics[width=0.75\linewidth]{figures/kalman_filter_plots_exc6(314).pdf}
+  \end{center}
+  The code is attached in the appendix.
   
 \end{solution}   
  \question[10] \textit{Crassidis \& Junkins} Problem 3.15
 \begin{solution}
-  
+  What we can see from the new H matrix, is that convergence for the $ \left( l^2 \right)  $  norms between the states true and predicted states almost instantly, in a matter of miliseconds go to 0. The reason is because of observability.
+
+  \begin{enumerate}
+    \item \textbf{\textit{Case 1}}
+    \begin{itemize}
+      \item For state 1, we see that its taking more time to converge to between the $ 3\sigma $ bounds
+      \item For state 2, we have the same story, longer time, with higher variance, but it seems to be more within the $ 3\sigma $ bounds  
+    \end{itemize}
+    \item \textbf{\textit{Case 2}}
+    \begin{itemize}
+      \item For state 1, we have better performance, with tighter $ 3\sigma $ bounds, and also faster convergence. 
+      \item For state 2, its performing alot better, with the previous measurement model having really bad convergence. But there is still a lot of outliers in the data, because its not largely contained within the $ 3\sigma $ bounds 
+    \end{itemize}
+    \item \textbf{\textit{Case 3}}
+    \begin{itemize}
+      \item For state 1, we have better performance for convergence and variance. Great success
+      \item For state 2, same story, faster convergence, and smaller $ 3\sigma $ bounds. 
+    \end{itemize}
+    \item \textbf{\textit{Case 4}}
+    \begin{itemize}
+      \item For state 1, we have better convergence and tighter bounds
+      \item For state 2, we have also better convergence, and smaller variance with slightly tighet bounds
+    \end{itemize}
+  \end{enumerate}
+
+  So overall, we can say confidently that the model has largely improved, by providing a measurement model that gives better observability.
+
+  Here is the figures from the matlab script
+  \begin{center}
+  \includegraphics[width=0.75\linewidth]{figures/kalman_filter_plot_norms_315.pdf}
+  \end{center}
+
+
+  \begin{center}
+  \includegraphics[width=0.75\linewidth]{figures/kalman_filter_plots_exc6(315).pdf}
+  \end{center}
+
+
 \end{solution}
  \question[10] \textit{Crassidis \& Junkins} Problem 7.4
 \begin{solution}
-  
+  The updated quaternion is found using $ \hat{q}_{k+1}^- = \bar{\Omega} \left( \hat{\omega}_k^+ \right) \hat{q}_k^+  $ 
+
+  Discrete propagation of the covariance equation is $ P_{k+1}^- = \Phi_k P_k^+ \Phi_k^T + \gamma_k Q_k \gamma_k^T $ 
+
 \end{solution}
 
 \end{questions}

@@ -1,7 +1,7 @@
 clear all; close all; clc;
 
 A = [9.9985 * 10^-1, 9.8510 * 10^-3;
-    -2.9553 * 10-2, 9.7030 * 10^-1];
+    -2.9553 * 10^-2, 9.7030 * 10^-1];
 B = [4.9502 * 10^-5;
     9.8510 * 10^-3];
 
@@ -34,7 +34,7 @@ function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
     P_plus = zeros(2,2,N);
 
     x_hat_minus(:,1) = x_hat0_minus;
-    P0_minus(:, :, 1) = P0_minus;
+    P_minus(:, :, 1) = P0_minus;
     for k=1:N
         Kk = P_minus(:, :, k) * H' / (H * P_minus(:, :, k) * H' + R);
         x_hat_plus(:, k) = x_hat_minus(:, k) + Kk * (y_meas(k) - H * x_hat_minus(:, k));
@@ -46,88 +46,141 @@ function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
         end
     end
 end
+%% Test different initial conditions - INTERESTING SCENARIOS
+fprintf('Running Kalman filter with different initial conditions...\n');
 
+% SCENARIO 1: Extremely overconfident but slightly wrong
+% This shows how dangerous overconfidence can be
+[x_hat_plus_1, P_plus_1] = runKalmanFilter(A, B, H, Q, R, y_meas, [1.5; 0.5], [0.0001 0; 0 0.0001], N);
 
-% Case 1: Initial state [0,0], P0 = I
-fprintf('Running Case 1...\n');
-x_hat0_1 = [0; 0];
-P0_1 = [1 1;
-    1 1];
-[x_hat_plus_1, P_plus_1] = runKalmanFilter(A, B, H, Q, R, y_meas, [0;0], [0 0;0 0], N);
-[x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [1;1], [0.01 0.01;0.01 0.01], N);
-[x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [100; 100], [1 1; 1 1], N);
+% SCENARIO 2: Very wrong but very uncertain - should converge fast
+[x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [50; -50], [100 0; 0 100], N);
+
+% SCENARIO 3: Realistic case - somewhat wrong with realistic uncertainty
+[x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [2; -1], [0.5 0.1; 0.1 0.5], N);
+
+% SCENARIO 4: Perfect initial state but overconfident
+[x_hat_plus_4, P_plus_4] = runKalmanFilter(A, B, H, Q, R, y_meas, [1; 1], [0.001 0; 0 0.001], N);
+
+% SCENARIO 5: Very wrong with correlated uncertainty
+[x_hat_plus_5, P_plus_5] = runKalmanFilter(A, B, H, Q, R, y_meas, [-20; 30], [2 1.5; 1.5 2], N);
+
+% Calculate errors
 error_1 = x_true - x_hat_plus_1;
 error_2 = x_true - x_hat_plus_2;
 error_3 = x_true - x_hat_plus_3;
-dist1 = sqrt(sum((error_1).^2));
-dist2 = sqrt(sum((error_2).^2));
-dist3 = sqrt(sum((error_3).^2));
+error_4 = x_true - x_hat_plus_4;
+
+% Calculate Euclidean distances
+dist1 = sqrt(sum(error_1.^2, 1));
+dist2 = sqrt(sum(error_2.^2, 1));
+dist3 = sqrt(sum(error_3.^2, 1));
+dist4 = sqrt(sum(error_4.^2, 1));
+
+% Plot Euclidean distances
 figure;
-plot(1:N, [dist1.', dist2.', dist3.']); legend('est1', 'est2', 'est3')
-xlim([1, N]);
+plot(time, dist1, 'r-', 'LineWidth', 1.5); hold on;
+plot(time, dist2, 'g-', 'LineWidth', 1.5);
+plot(time, dist3, 'b-', 'LineWidth', 1.5);
+plot(time, dist4, 'm-', 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Euclidean Distance');
+title('Distance Between True and Estimated State - Interesting Scenarios');
+legend(...
+    'Case 1: Slightly Wrong + Overconfident', ...
+    'Case 2: Very Wrong + Very Uncertain', ...
+    'Case 3: Somewhat Wrong + Realistic', ...
+    'Case 4: Perfect + Overconfident', ...
+    'Location', 'best');
+grid on;
 
-return
-sigma_bounds_1 = 3 * squeeze(sqrt([P_plus_1(1,1,:), P_plus_1(2,2,:)]))';
+figure('Position', [80, 80, 900, 1200]);
 
-% Plot Case 1
-figure('Position', [100, 100, 1200, 800]);
-
-subplot(2,2,1);
+% Case 1 - State 1
+subplot(4,2,1);
+sigma_bounds_1_state1 = 3 * squeeze(sqrt(P_plus_1(1,1,:)));
 plot(time, error_1(1,:), 'b', 'LineWidth', 1.5); hold on;
-plot(time, sigma_bounds_1(:,1), 'r--', 'LineWidth', 1);
-plot(time, -sigma_bounds_1(:,1), 'r--', 'LineWidth', 1);
-xlabel('Time (s)'); ylabel('Error');
-title('Case 1: State 1 Error (x\_hat0 = [0;0], P0 = I)');
+plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 1: State 1 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
 legend('Error', '3σ Bound', 'Location', 'best');
 grid on;
 
-subplot(2,2,2);
+% Case 1 - State 2
+subplot(4,2,2);
+sigma_bounds_1_state2 = 3 * squeeze(sqrt(P_plus_1(2,2,:)));
 plot(time, error_1(2,:), 'b', 'LineWidth', 1.5); hold on;
-plot(time, sigma_bounds_1(:,2), 'r--', 'LineWidth', 1);
-plot(time, -sigma_bounds_1(:,2), 'r--', 'LineWidth', 1);
-xlabel('Time (s)'); ylabel('Error');
-title('Case 1: State 2 Error (x\_hat0 = [0;0], P0 = I)');
+plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 1: State 2 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 2 - State 1
+subplot(4,2,3);
+sigma_bounds_2_state1 = 3 * squeeze(sqrt(P_plus_2(1,1,:)));
+plot(time, error_2(1,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 2: State 1 Error (x0=[50; -50], P=[100 0; 0 100])');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 2 - State 2
+subplot(4,2,4);
+sigma_bounds_2_state2 = 3 * squeeze(sqrt(P_plus_2(2,2,:)));
+plot(time, error_2(2,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 2: State 2 Error (x0=[50; -50], P=[100 0; 0 100])');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
+
+% Case 3 - State 1
+subplot(4,2,5);
+sigma_bounds_3_state1 = 3 * squeeze(sqrt(P_plus_3(1,1,:)));
+plot(time, error_3(1,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 3: State 1 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
 legend('Error', '3σ Bound', 'Location', 'best');
 grid on;
 
 
-sgtitle('Kalman Filter Estimation Errors with 3σ Bounds');
+% Case 3 - State 2
+subplot(4,2,6);
+sigma_bounds_3_state2 = 3 * squeeze(sqrt(P_plus_3(2,2,:)));
+plot(time, error_3(2,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 3: State 2 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
 
+% Case 4 - State 1
+subplot(4,2,7);
+sigma_bounds_4_state1 = 3 * squeeze(sqrt(P_plus_4(1,1,:)));
+plot(time, error_4(1,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 4: State 1 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
 
-
-sgtitle('Kalman Filter Estimation Errors with 3σ Bounds (Continued)');
-
-%% Convergence Analysis
-fprintf('\n=== Convergence Analysis ===\n');
-
-% Check if errors remain within 3σ bounds
-for i = 1:4
-    switch i
-        case 1
-            error = error_1;
-            sigma_bounds = sigma_bounds_1;
-            case_name = 'Case 1';
-    end
-    
-    % Check if errors are within 3σ bounds (after initial transient)
-    steady_state_start = 501; % Start checking from middle of simulation
-    within_bounds_state1 = sum(abs(error(1, steady_state_start:end)) <= sigma_bounds(steady_state_start:end, 1)');
-    
-    percentage_state1 = within_bounds_state1 / (N - steady_state_start + 1) * 100;
-    
-    fprintf('%s:\n', case_name);
-    fprintf('  State 1: %.2f%% of errors within 3σ bounds\n', percentage_state1);
-    
-    % Check final error magnitude
-    final_error_state1 = abs(error(1, end));
-    fprintf('  Final errors: State1 = %.4f', final_error_state1);
-end
-
-%% Display System Information
-fprintf('=== System Information ===\n');
-fprintf('Sampling interval: %.3f s\n', dt);
-fprintf('Simulation duration: %.1f s\n', time(end));
-fprintf('Process noise variance Q: %.2f\n', Q);
-fprintf('Measurement noise variance R: %.4f\n', R);
-fprintf('Eigenvalues of Phi: %.4f, %.4f\n', eig(A));
-
+% Case 4 - State 2
+subplot(4,2,8);
+sigma_bounds_4_state2 = 3 * squeeze(sqrt(P_plus_4(2,2,:)));
+plot(time, error_4(2,:), 'b', 'LineWidth', 1.5); hold on;
+plot(time, sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
+ylabel('Error');
+title('Case 4: State 2 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
+legend('Error', '3σ Bound', 'Location', 'best');
+grid on;
