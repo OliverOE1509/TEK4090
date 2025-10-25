@@ -134,7 +134,7 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
 
         \begin{itemize}
           \item $ \dot{s_1} = \frac{ s_2^2 }{ 2r } $
-          \item $ \dot{s_2} = \frac{ s_2s_2 }{ 2r } - s_1 $
+          \item $ \dot{s_2} = \frac{ s_2s_3 }{ 2r } - s_1 $
           \item $ \dot{s_3} = \frac{ s_3^2 }{ 2r } - 2s_2 $  
         \end{itemize}
         
@@ -150,6 +150,17 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
       
       \end{solution}
    \part Write the linear state feedback optimal control policy in terms of the $s_i(t)$'s. 
+
+      \begin{solution}
+        We have $ u^* = \frac{ - \lambda _2 }{ 2r } $ from the HJB. 
+        
+        $ \lambda _2 = s_2x + s_3 \dot{x} $. So \[
+            u^* = \frac{ -s_2 x }{ 2r } - \frac{ s_3 \dot{x} }{ 2r }
+        \]
+
+        This is the linear state feedback. Its the optimal control policy in terms of $s_2$ and $s_3$, with gains $ \frac{ -s_2(t) }{ 2r } $ on position and $ \frac{ -s_3(t) }{ 2r } $ on velocity.  
+        
+      \end{solution}
   \end{parts}
 \end{question}
 
@@ -159,10 +170,64 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
   Pick a system from a paper that you have found on a topic that you are interested in, potentially the topic you will choose for your final project.
   \begin{parts}
     \part What is/are the paper(s) you are drawing from?
+    \begin{solution}
+      This paper presents a dynamic model of a quadcopter UAV with friction effects, and a two level input-output control strategy combining linearization and PID controllers
+    \end{solution}
     \part What are the dynamics of the system in question? What are the inputs and outputs?
+    \begin{solution}
+      \begin{itemize}
+        \item \textbf{\textit{Inputs:}}
+        \begin{enumerate}
+          \item Total thrust F
+          \item Torques $ \left[ \rho_{\phi}, \rho_{\theta}, \rho_{\psi} \right]  $ 
+        \end{enumerate}
+        \item \textbf{\textit{Outputs:}}
+        \begin{itemize}
+          \item Position $ \xi = \left[ x, y, z \right]^T  $ 
+          \item Orientation $ \eta = \left[ \phi, \theta, \psi \right]^T  $ 
+        \end{itemize}
+      \end{itemize}
+      The quadcopter is modelled as a nonlinear underactuated system. The euler-lagrange equations are used to derive the equations of motion, and they also include frictionless terms. 
+
+      By friction terms, they mean simplified models for including air resistance and aerodynamic drag
+    \end{solution}
     \part What is the system trying to achieve?
+
+    \begin{solution}
+      The paper tries to solve the following
+
+      \begin{enumerate}
+        \item Hovering, take-off and landing
+        \item Follow a predetermined path in 3d, or geometric trajectories
+        \item Stabilizing attitude, namely the pitch, roll and yaw.
+      \end{enumerate}
+    \end{solution}
     \part What are the challenges for the system?
+
+    \begin{solution}
+      The problems in the paper are 
+      \begin{itemize}
+        \item \textbf{\textit{Problem 1}}: Coupling between rotational and translational motions, meaning that in order to move forward, the nose must first tip down, as the only thrusters points down.
+        \item \textbf{\textit{Problem 2}}: Nonlinear dynamics. This means that there is not a function that can connect the inputs to the outputs, like a traditional function $f(x) = kx^n$ 
+        \item \textbf{\textit{Problem 3}}: Avoiding local linearization, i.e. when changing an action, from hovering to travelling, the local linearization becomes invalid. This is the same logic as using Taylor expansions of a function around a point. The approximation works great locally, but move away and the error between approximation and true f grows large.
+        \item \textbf{\textit{Problem 4}}: Friction and air drag. Also in a realistic situtation, you need to figure out how to account for essentially random gusts of wind that puts the drone out of balance.
+        \item \textbf{\textit{Problem 5}}: Need for fast and stable inner-loop control to support outer loop control
+        \item \textbf{\textit{Problem 6}}: Singularities when $ \phi, \theta = \pm \frac{ \pi }{ 2 } $ 
+      \end{itemize}
+    \end{solution}
+
     \part What control tools can help the system overcome the challenges in achieving its goals?
+
+    \begin{solution}
+      For choosing the right gains,  they propose that the gains follow a characteristic equation. They do this by pole placement, and finding the gains K that solves the characteristic equation.
+
+      For the singularities for the angles $ \phi$ and $\theta $,  they define angle limiters, which is simple enough. They could also use quaternions, for more continuous movement, but avoided it for simplicity.
+
+      To solve the stability problem, they make an inner- and outer loop. The inner loop controls the quadcopters orientation and attitute, while the outer control deals with the position.
+
+      For the input-output linearisation, the paper proposes to transform the nonlinear dynamics into linear decoupled systems. Unlike taylor series, which only works locally, this method is globally valid, as each degree of freedom to be tuned is not a function of another variable.
+    \end{solution}
+
   \end{parts}
 \end{question}
 
@@ -703,9 +768,30 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
 \end{solution}
  \question[10] \textit{Crassidis \& Junkins} Problem 7.4
 \begin{solution}
+
+  \begin{center}
+  \includegraphics[width=0.75\linewidth]{figures/Exc74.png}
+  \end{center}
+
   The updated quaternion is found using $ \hat{q}_{k+1}^- = \bar{\Omega} \left( \hat{\omega}_k^+ \right) \hat{q}_k^+  $ 
 
   Discrete propagation of the covariance equation is $ P_{k+1}^- = \Phi_k P_k^+ \Phi_k^T + \gamma_k Q_k \gamma_k^T $ 
+
+  Our task is to estimate the attitute of a spacecraft in orbit, using the Extended Kalman Filter (EKF). The spacecraft attitude, represented as a quaternion. 
+
+  The attitude dynamics are governed by the system model 
+  \[
+      \dot{q} = \frac{ 1 }{ 2 } \Omega(\vec{\omega})\vec{q}
+  \]
+  with bias dynamics
+
+  \[
+      \dot{\vec{b}} = \vec{\eta}_u
+  \]
+
+  Where $\boldsymbol{\eta}_v \sim \mathcal{N}(0, \sigma_v^2 \mathbf{I}_3)$ is the gyro measurement noise and $\boldsymbol{\eta}_u \sim \mathcal{N}(0, \sigma_u^2 \mathbf{I}_3)$ is the gyro bias drift noise
+  
+  
 
 \end{solution}
 
