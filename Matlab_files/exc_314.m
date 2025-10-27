@@ -26,8 +26,7 @@ for k = 1:N-1
 end
 
 y_meas = H * x_true + v';
-function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
-    runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
+function [x_hat_plus, P_plus] = runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
     x_hat_minus = zeros(2, N);
     x_hat_plus = zeros(2, N);
     P_minus = zeros(2,2,N);
@@ -51,7 +50,6 @@ end
 [x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [50; -50], [100 0; 0 100], N);
 [x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [2; -1], [0.5 0.1; 0.1 0.5], N);
 [x_hat_plus_4, P_plus_4] = runKalmanFilter(A, B, H, Q, R, y_meas, [1; 1], [0.001 0; 0 0.001], N);
-[x_hat_plus_5, P_plus_5] = runKalmanFilter(A, B, H, Q, R, y_meas, [-20; 30], [2 1.5; 1.5 2], N);
 
 error_1 = x_true - x_hat_plus_1;
 error_2 = x_true - x_hat_plus_2;
@@ -94,8 +92,8 @@ grid on;
 subplot(4,2,2);
 sigma_bounds_1_state2 = 3 * squeeze(sqrt(P_plus_1(2,2,:)));
 plot(time, error_1(2,:), 'b', 'LineWidth', 1.5); hold on;
-plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, sigma_bounds_1_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_1_state2, 'r--', 'LineWidth', 1);
 ylabel('Error');
 title('Case 1: State 2 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
 legend('Error', '3σ Bound', 'Location', 'best');
@@ -104,8 +102,8 @@ grid on;
 subplot(4,2,3);
 sigma_bounds_2_state1 = 3 * squeeze(sqrt(P_plus_2(1,1,:)));
 plot(time, error_2(1,:), 'b', 'LineWidth', 1.5); hold on;
-plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, sigma_bounds_2_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_2_state1, 'r--', 'LineWidth', 1);
 ylabel('Error');
 title('Case 2: State 1 Error (x0=[50; -50], P=[100 0; 0 100])');
 legend('Error', '3σ Bound', 'Location', 'best');
@@ -114,8 +112,8 @@ grid on;
 subplot(4,2,4);
 sigma_bounds_2_state2 = 3 * squeeze(sqrt(P_plus_2(2,2,:)));
 plot(time, error_2(2,:), 'b', 'LineWidth', 1.5); hold on;
-plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, sigma_bounds_2_state2, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_2_state2, 'r--', 'LineWidth', 1);
 ylabel('Error');
 title('Case 2: State 2 Error (x0=[50; -50], P=[100 0; 0 100])');
 legend('Error', '3σ Bound', 'Location', 'best');
@@ -124,8 +122,8 @@ grid on;
 subplot(4,2,5);
 sigma_bounds_3_state1 = 3 * squeeze(sqrt(P_plus_3(1,1,:)));
 plot(time, error_3(1,:), 'b', 'LineWidth', 1.5); hold on;
-plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+plot(time, sigma_bounds_3_state1, 'r--', 'LineWidth', 1);
+plot(time, -sigma_bounds_3_state1, 'r--', 'LineWidth', 1);
 ylabel('Error');
 title('Case 3: State 1 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
 legend('Error', '3σ Bound', 'Location', 'best');

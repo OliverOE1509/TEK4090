@@ -5,6 +5,7 @@ nMeasurements = 2;
 q = 1e4;  
 r = 1e2;  
 x_bar = 20 * ones(nRooms, 1);
+sigma_meas = 0.1;
 T = 86400;
 t = linspace(0, T, 1000);
 c = 1/(1.08e6);
@@ -13,7 +14,7 @@ A = [-30 10 0 0 10;
      10 -40 10 0 10;
      0 10 -40 10 10;
      0 0 10 -30 10;
-     10 10 10 10 -50] * c;
+     10 10 10 10 -50] ;
 
 B = [1 0 0;
      0 1 0;
@@ -52,20 +53,27 @@ z0_true = x0_true - x_bar;
 
 x0_est = 18 * ones(nRooms, 1);  
 z0_est = x0_est - x_bar;
+disp(z0_est)
 
 z0_aug = [z0_true; z0_est];
 
-augmentedDynamics = @(t, z_aug) [
-    A * z_aug(1:5) + B * (-K * z_aug(6:10)) + ...  
-    B_ambient * (x_a(t) - 20) + ...              
-    D_disturbance * d_func(t) * ones(5,1);       
+function dz_aug = augmentedDynamics(t, z_aug, A, B, K, L, C, B_ambient, D_disturbance, x_a, d_func, sigma_meas)
+    z_true = z_aug(1:5);
+    z_est = z_aug(6:10);
     
-    A * z_aug(6:10) + B * (-K * z_aug(6:10)) + ... 
-    L * (C * z_aug(1:5) - C * z_aug(6:10))         
-];
+    y_meas = C * z_true + sigma_meas * randn(2,1);
+    
+    dz_true = A * z_true + B * (-K * z_est) + ...
+              B_ambient * (x_a(t) - 20) + ...
+              D_disturbance * d_func(t) * ones(5,1);
+    
+    dz_est = A * z_est + B * (-K * z_est) + L * (y_meas - C * z_est);
+    
+    dz_aug = [dz_true; dz_est];
+end
 
-[t_sim, z_aug] = ode45(@(t,z) augmentedDynamics(t, z), t, z0_aug);
-
+[t_sim, z_aug] = ode45(@(t,z) augmentedDynamics(t, z, A, B, K, L, C, B_ambient, D_disturbance, x_a, d_func, sigma_meas), ...
+                       t, z0_aug);
 z_true = z_aug(:, 1:5)';
 z_est = z_aug(:, 6:10)';
 

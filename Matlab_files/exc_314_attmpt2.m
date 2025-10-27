@@ -88,7 +88,7 @@ title('Distance Between True and Estimated State');
 legend('Case 1: x0=[0,0], P0=0', 'Case 2: x0=[1,1], P0=0.01I', 'Case 3: x0=[100,100], P0=I', 'Location', 'best');
 grid on;
 
-return
+
 
 %% Plot state errors with 3σ bounds for all cases
 figure('Position', [100, 100, 1200, 800]);

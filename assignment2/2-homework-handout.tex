@@ -164,9 +164,9 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
         Now for the initial conditions. At $ t=2=T $, cost to go is $ J^*(T)= \frac{ 1 }{ 2 } x(T)^2 $. From $ J^*= \frac{ 1 }{ 2 } s_1(T)x^2 + s_2(T) x \dot{x} + s_3(T) \dot{x}^2 $, we draw that 
         
         \begin{itemize}
-          \item $ s_1(T)=1 $
-          \item $ s_2(T)=0 $
-          \item $ s_3(T)=0 $   
+          \item $ s_1(2)=1 $
+          \item $ s_2(2)=0 $
+          \item $ s_3(2)=0 $   
         \end{itemize}
         
 
@@ -368,7 +368,23 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
       \[
           f'(a+h) \geq f'(a) 
       \]
-      which implies that $ \frac{ f'(a+h) - f'(a) }{ h } \geq 0 $ which is what we wanted to show. A similar argument is made for $ f''(b) $  
+      which implies that $ \frac{ f'(a+h) - f'(a) }{ h } \geq 0 $. Now taking the limit as h approaches 0 from above, we get
+      \[
+          \lim_{h \to 0^+} \frac{ f'(a + h) - f'(a) }{ h } \geq 0
+      \]
+
+       
+      which is what we wanted to show. A similar argument is made for $ f''(b) $. For $ h < 0 $, then 
+      \[
+          f(b) \geq f(b+h)
+      \]
+      so $ \frac{ f'(b) - f(b+h) }{ -h } \geq 0 $ for all $ h<0 $. Taking the limit as h approaches 0 from below, we get
+      \[
+          f''(b) = \lim_{h \to 0^-}  \frac{ f'(b) - f'(b+h }{ -h } \geq 0
+      \]
+      . Therefore, we get that $ f''(a) \geq 0 $ and $ f''(b) \geq 0 $  
+      
+        
          
     \end{solution}
   \end{parts}
@@ -489,13 +505,13 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
             0 & 0 & \frac{ h_{43} }{ C_4 } &  -  \sum_{ j }^{  } \frac{ h_{4j} }{ C_4 } & \frac{ h_{45} }{ C_4 } \\
             \frac{ h_{51} }{ C_5 } & \frac{ h_{52} }{ C_5 } & \frac{ h_{53} }{ C_5 } & \frac{ h_{54} }{ C_5 } & -  \sum_{ j }^{  } \frac{ h_{5j} }{ C_5 } 
         \end{bmatrix}\\
-        &= \begin{bmatrix}
+        &= \frac{ 1 }{ C } \begin{bmatrix}
             -30 & 10 & 0 &0&10\\
             10&-40&10&0&10\\
             0&10&-40&10&10\\
             0&0&10&-30&10\\
             10&10&10&10&-50
-        \end{bmatrix}  
+        \end{bmatrix}  \quad C = 1.08 \times 10^6 \text{ J/°K}
     \end{align*}
     
       
@@ -590,7 +606,7 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
         10
     \end{bmatrix}  $ 
 
-    We are. then allowed to rewrite our system as 
+    We are then allowed to rewrite our system as 
 
     $ \dot{z} = Az + A\bar{x} + B_d d + B_a x_a  $\\
     $ \dot{z} = Az+ B_u u^*  + B_d d + \begin{bmatrix}
@@ -618,15 +634,15 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     
     
     For the LQR system design, I use the lqr function with 
-    $ Q = I*q $ and $ R = I*r $. The difference $ \left( q-r \right) $ indicates if I favor tracking errors or control effort of the radiators more. In my case, with $ q=1e6 $ and $ r=1e2 $, the balance is $ \frac{ q }{ r }=1000 $. 
+    $ Q = I*q $ and $ R = I*r $. The difference $ \left( q-r \right) $ indicates if I favor tracking errors or control effort of the radiators more. In my case, with $ q=1e4 $ and $ r=1e2 $, the balance is $ \frac{ q }{ r }=100 $. 
     
-    For observer design, we must check that the system is observable. The LQR controller $ u=-K z $ requires full state knowledge.  With only two temperature measurements in two rooms, we need full state observability over all the states $ \left( z \right) _i^{1 to 5} $. We have the true system $ \dot{z} = Az + Bu +\text{disturbance term} $, and in parallell, we have a observer running $ \dot{z} = Az + Bu + L(y - C\hat{z} $   
+    For observer design, we must check that the system is observable. The LQR controller $ u=-K z $ requires full state knowledge.  With only two temperature measurements in two rooms, we need full state observability over all the states $ \left( z \right) _i^{1 \text{ to } 5} $. We have the true system $ \dot{z} = Az + Bu +\text{disturbance term} $, and in parallell, we have a observer running $ \dot{z} = Az + Bu + L(y - C\hat{z} $   
 
     To derive the augmented matrix, we have the true state dynamic $ \dot{z} = Ax + Bu + B_{ext} w $ where $ w = \begin{bmatrix}
         d\\
         x_a
     \end{bmatrix}  $  
-    The observer dynamics is defined as 
+    .The observer dynamics is defined as 
     
     \begin{align*}
       \frac{ d\hat{z} }{ dt } &= A\hat{z} + Bu + L \left( Cz - C\hat{z} \right)\\
@@ -640,7 +656,7 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     \]
     Substituting this to the true dynamics gives 
     \[
-        \dot{z} = Ax + B \left( -K\hat{z} \right) + B_{ext} w
+        \dot{z} = Az + B \left( -K\hat{z} \right) + B_{ext} w
     \]
 
     Also substituting into the observer,
@@ -653,10 +669,29 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
 
     \[
         A_{aug} = \begin{bmatrix}
-            A&-B_u K\\
-            LC&A-B_uK-LC
+            A&-B K\\
+            LC&A-BK-LC
         \end{bmatrix} 
     \]
+
+    which gives the full augmented system
+
+    \[
+        \frac{ d }{ dt } \begin{bmatrix}
+            z_{true} \\
+            z_{est}
+        \end{bmatrix} = \begin{bmatrix}
+            A & -BK \\
+            LC & A - BK - LC
+        \end{bmatrix} \begin{bmatrix}
+            z_{true} \\
+            z_{est} 
+        \end{bmatrix} + \begin{bmatrix}
+            B_{ext} \\
+            0
+        \end{bmatrix} w
+    \]
+    
     
     Now \begin{itemize}
       \item $ A_{aug} $ is a $ 10\times 10 $ matrix
@@ -664,12 +699,19 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
       \item $ z_{aug} $ is a $ 10 \times 1 $ matrix    
     \end{itemize}  
 
+    The initial conditions for $ z_{est} $  is $ \left[ -2, -2, -2, -2, -2 \right]  $. And for $ z_{true} $ the initial conditions are $ \left[ -4, -7, -2, -9, 0 \right]  $ The measurements include sensor noise:
+    \[
+    y = C z_{\text{true}} + v, \quad v \sim \mathcal{N}(0, \sigma_{\text{meas}}^2 I), \quad \sigma_{\text{meas}} = 0.1^\circ\text{C}
+    \]
+
     Now the plot looks like this, and it should include everything demanded
     
     \begin{center}
-    \includegraphics[width=1\linewidth]{./figures/Exc4d_buildingDynamics.pdf}\\
+    \includegraphics[width=1\linewidth]{./figures/Exc4d_BuildingDynamics_controls.pdf}\\
     \textbf{Fig.~3:} Building model schematic
     \end{center}
+
+    This figure makes sense, becase as the initial temperature is lower than the required degree of $ 20 \celsius $, we need a positive control effort from the radiatiors, in the form of positive watts, to drive the temperature $ x $  to $ \bar{x} $. If the initial temperatures were over $ 20 \celsius $, we would get a negative control effort, which just means the radiators are turned off. 
 
   
   \end{parts}
@@ -723,7 +765,7 @@ Prove that
   we get that \[
       u_{N-1}^* := K_{N-1} x_{N-1} 
   \]
-  which is the optimal cost to go from step number $ N-1 $. We can go recursively back and find that 
+  which is the optimal cost to go from step number $ N-1 $. We can go recursively back with the riccati equations and find that 
   
 \begin{align*}
   J_0^* &= x_0^TS_0x_0\\
@@ -765,34 +807,38 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
 \end{solution}   
  \question[10] \textit{Crassidis \& Junkins} Problem 3.15
 \begin{solution}
-  What we can see from the new H matrix, is that convergence for the $ \left( l^2 \right)  $  norms between the states true and predicted states almost instantly, in a matter of miliseconds go to 0. The reason is because of observability.
+  What we can see from the new H matrix, is that convergence for the $ \left( l^2 \right)  $  norms between the states true and predicted states, happens almost instantly, in a matter of miliseconds go to 0. The reason is because of observability. From the last exercise, a covariance matrix of zero is synologous with an overconfidence in the true difference between predicted and actual state, being small. 
 
   \begin{enumerate}
     \item \textbf{\textit{Case 1}}
+    Here we are very confident,  and also relatively. close to the true state.
     \begin{itemize}
       \item For state 1, we see that its taking more time to converge to between the $ 3\sigma $ bounds
       \item For state 2, we have the same story, longer time, with higher variance, but it seems to be more within the $ 3\sigma $ bounds  
     \end{itemize}
     \item \textbf{\textit{Case 2}}
+    Here we have low confidence, and far off initial states.
     \begin{itemize}
       \item For state 1, we have better performance, with tighter $ 3\sigma $ bounds, and also faster convergence. 
       \item For state 2, its performing alot better, with the previous measurement model having really bad convergence. But there is still a lot of outliers in the data, because its not largely contained within the $ 3\sigma $ bounds 
     \end{itemize}
     \item \textbf{\textit{Case 3}}
+    Here we start off close to the true state, but trust our model more than our sensors.
     \begin{itemize}
       \item For state 1, we have better performance for convergence and variance. Great success
       \item For state 2, same story, faster convergence, and smaller $ 3\sigma $ bounds. 
     \end{itemize}
     \item \textbf{\textit{Case 4}}
+    Here we are spot on, but overconfident.
     \begin{itemize}
       \item For state 1, we have better convergence and tighter bounds
       \item For state 2, we have also better convergence, and smaller variance with slightly tighet bounds
     \end{itemize}
   \end{enumerate}
 
-  So overall, we can say confidently that the model has largely improved, by providing a measurement model that gives better observability.
+  So overall, we can say confidently that the model has largely improved, by providing a measurement model that gives better observability. We would much rather have a realistic balance between overconfidence and low self-esteem in our sensors.
 
-  Here is the figures from the matlab script
+  Here are the figures from the matlab script
   \begin{center}
   \includegraphics[width=0.75\linewidth]{figures/kalman_filter_plot_norms_315.pdf}
   \end{center}
@@ -818,7 +864,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
 
   For the gyro measurements, we used a first order markov process
   \[
-      \vec{\omega}_measured = \omega_true + \beta + \eta_v  \tag{the measurement noise}
+      \vec{\omega}_{measured} = \omega_{true} + \beta + \eta_v  \tag{the measurement noise}
   \]
   \[
       \frac{ d\beta }{ dt } = \eta_u \tag{bias drift noise} 
@@ -826,7 +872,8 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   where beta is the gyro bias vector. 
   
 
-  For the error state formulation, we use the multiplictive error to maintain the quaternion normalization constraint, $ \delta \vec{q} = \vec{q} \otimes \hat{\vec{q}}^{-1} $ 
+  For the error state formulation, we use the direct error to maintain the quaternion normalization constraint, $ \delta \vec{q} = \vec{q} \otimes \hat{\vec{q}}^{-1} $
+  
   
   The error state dynamics are given as linearized error dynamics, 
   \begin{itemize}
@@ -841,9 +888,9 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   \end{bmatrix}  $  
 
 
-  And now for the extended kalman filter implementation, we start by defining the state vector $ \vec{x} = \left[ \delta \alpha, \Delta \beta^T \right]  $. For each step in our discretized timeline, we propagate the new quaternion as 
+  And now for the extended kalman filter implementation, we start by defining the state vector $ \vec{x} = \left[ \vec{q}, \vec{\beta} \right]  $. For each step in our discretized timeline, we propagate the new quaternion as 
   \[
-      \hat{q}_{k+1}^- = exp \left( \frac{ 1 }{ 2 } \Omega \left( \hat{\omega}_k^+ \right) \Delta t  \right) \hat{q}_k^+ 
+      \hat{q}_{k+1}^- =  \frac{ 1 }{ 2 } \Omega(\hat{\omega}_k \Delta t) \hat{q}_k^+
   \]
   where the exponential is computed as 
   $$ exp \left( \frac{ 1 }{ 2 } \Omega (\omega) \delta t \right) = \begin{bmatrix}
@@ -853,9 +900,9 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   with $ \psi = sin \left( 1/2 \norm{\omega}_{}^{} \Delta t \right) * \frac{ \omega }{ \norm{\omega}_{}^{}  }  $ 
 
 
-  The process noise covariation (eq. 7.46) is given by $$ Q = \begin{bmatrix}
-      \left( \sigma_v^2 \Delta t + \frac{ 1 }{ 2 } \sigma_u^2 \Delta t^3 \right) & \left(  \frac{ 1 }{ 2 } \sigma _u^2 \Delta t^3 \right) * I \\
-      \left(  \frac{ 1 }{ 2 } \sigma_u^2 \Delta t^2 \right) I & \left(  \sigma_u^2 \Delta t \right) I  
+  For simplification, I used a diagonal process noise covariance matrix. $$ Q = \begin{bmatrix}
+     \sigma_v^2 \Delta t \cdot I_3 & 0 \\
+     0 & \sigma_u^2 \Delta t \cdot I_3
   \end{bmatrix}  $$
 
   And is in this case a $ 6 \times 6 $ shaped matrix 
@@ -873,12 +920,12 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
           \left[ A(\hat{q}) r_2 \times \right] & 0 \\
     \end{bmatrix} 
   \]
-  where again $ \left[ v \times \right]  $ is the skew symmetric matrix.
+  where again $ \left[ v \times \right]  $ is the skew symmetric matrix. 
   
   Furthermore, for the implementation strategy, we assume a constant angular velocity, and measurements are made with gyros that contain a bias. The angular velocity is given by $ \omega_{true} = \left[ 0.001, 0.002, 0.0005 \right]$ rad /s. This creates a slow and accumulating rotation of all the axises, which is an attempt of more realistic dynamics. This is implemented with the function exact attitude. I also assume constant gyro biases
   $ \beta_{true} = \left[ 0.1, 0.1, 0.1 \right] \text{deg/hr} = \left[ 4.848*10^{-7}, 4.848*10^{-7}, 4.848*10^{-7} \right]$ rad/s
 
-  The sampling rate for the gyroscope is 1 Hz, which makes $ dt = 1  $ second. 
+  The sampling rate for the gyroscope is 1 Hz, which makes $ dt = 1  $ second. I put $ T = 60 $ minutes, and then I put the discretization as $ N = \frac{ T }{ dt } $. Thus for smaller dt, I increase the number N  
 
 
   Now we can start analyzing the filter performance
@@ -1071,16 +1118,16 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   x_a_values = arrayfun(x_a, t_sim);
   plot(t_hours, d_values, 'r-', 'LineWidth', 2); hold on;
   plot(t_hours, x_a_values, 'b-', 'LineWidth', 2);
-  ylabel('Power (W) / Temp (°C)');
+  ylabel('Power (W) / Temp (C)');
   title('External Influences');
-  legend('Disturbance d(t) [W]', 'Ambient Temp x_a(t) [°C]', 'Location', 'best');
+  legend('Disturbance d(t) [W]', 'Ambient Temp x_a(t) [C]', 'Location', 'best');
   grid on;
 
   subplot(3, 2, 2);
   plot(t_hours, x_true', 'LineWidth', 2); hold on;
   plot(t_hours, x_est', '--', 'LineWidth', 1);
-  yline(20, '--k', 'Setpoint 20°C', 'LineWidth', 1);
-  ylabel('Temperature (°C)');
+  yline(20, '--k', 'Setpoint 20 C', 'LineWidth', 1);
+  ylabel('Temperature (C)');
   title('True (solid) vs Estimated (dashed) Temperatures');
   legend('Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Location', 'best');
   grid on;
@@ -1095,7 +1142,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   subplot(3, 2, 4);
   est_errors = x_true' - x_est';
   plot(t_hours, est_errors, 'LineWidth', 1.5);
-  ylabel('Estimation Error (°C)');
+  ylabel('Estimation Error (C)');
   title('Observer Performance: True - Estimated');
   legend('Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Location', 'best');
   grid on;
@@ -1111,7 +1158,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   subplot(3, 2, 6);
   tracking_errors = x_true' - x_bar';
   plot(t_hours, tracking_errors, 'LineWidth', 1.5);
-  ylabel('Tracking Error (°C)');
+  ylabel('Tracking Error (celsius)');
   xlabel('Time (hours)');
   title('True System Tracking Performance');
   legend('Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Location', 'best');
@@ -1122,7 +1169,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
 \subsection{Matlab code for exc 6}
 
 \begin{lstlisting}[style=matlabstyle]
-  clear all; close all; clc;
+ clear all; close all; clc;
 
   A = [9.9985 * 10^-1, 9.8510 * 10^-3;
       -2.9553 * 10^-2, 9.7030 * 10^-1];
@@ -1150,8 +1197,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   end
 
   y_meas = H * x_true + v';
-  function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
-      runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
+  function [x_hat_plus, P_plus] = runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
       x_hat_minus = zeros(2, N);
       x_hat_plus = zeros(2, N);
       P_minus = zeros(2,2,N);
@@ -1175,7 +1221,6 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   [x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [50; -50], [100 0; 0 100], N);
   [x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [2; -1], [0.5 0.1; 0.1 0.5], N);
   [x_hat_plus_4, P_plus_4] = runKalmanFilter(A, B, H, Q, R, y_meas, [1; 1], [0.001 0; 0 0.001], N);
-  [x_hat_plus_5, P_plus_5] = runKalmanFilter(A, B, H, Q, R, y_meas, [-20; 30], [2 1.5; 1.5 2], N);
 
   error_1 = x_true - x_hat_plus_1;
   error_2 = x_true - x_hat_plus_2;
@@ -1212,47 +1257,47 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 1: State 1 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   subplot(4,2,2);
   sigma_bounds_1_state2 = 3 * squeeze(sqrt(P_plus_1(2,2,:)));
   plot(time, error_1(2,:), 'b', 'LineWidth', 1.5); hold on;
-  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, sigma_bounds_1_state2, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state2, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 1: State 2 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   subplot(4,2,3);
   sigma_bounds_2_state1 = 3 * squeeze(sqrt(P_plus_2(1,1,:)));
   plot(time, error_2(1,:), 'b', 'LineWidth', 1.5); hold on;
-  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, sigma_bounds_2_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_2_state1, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 2: State 1 Error (x0=[50; -50], P=[100 0; 0 100])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   subplot(4,2,4);
   sigma_bounds_2_state2 = 3 * squeeze(sqrt(P_plus_2(2,2,:)));
   plot(time, error_2(2,:), 'b', 'LineWidth', 1.5); hold on;
-  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, sigma_bounds_2_state2, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_2_state2, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 2: State 2 Error (x0=[50; -50], P=[100 0; 0 100])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   subplot(4,2,5);
   sigma_bounds_3_state1 = 3 * squeeze(sqrt(P_plus_3(1,1,:)));
   plot(time, error_3(1,:), 'b', 'LineWidth', 1.5); hold on;
-  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
-  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, sigma_bounds_3_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_3_state1, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 3: State 1 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
 
@@ -1263,7 +1308,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   plot(time, -sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 3: State 2 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   subplot(4,2,7);
@@ -1273,7 +1318,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   plot(time, -sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 4: State 1 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   subplot(4,2,8);
@@ -1283,11 +1328,535 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   plot(time, -sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
   ylabel('Error');
   title('Case 4: State 2 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
-  legend('Error', '3σ Bound', 'Location', 'best');
+  legend('Error', '3sigma Bound', 'Location', 'best');
   grid on;
 
   
 \end{lstlisting}
+
+
+\subsection{Matlab code for exercise 7}
+
+\begin{lstlisting}[style=matlabstyle]
+  clear all; close all; clc;
+
+  A = [9.9985 * 10^-1, 9.8510 * 10^-3;
+      -2.9553 * 10^-2, 9.7030 * 10^-1];
+  B = [4.9502 * 10^-5;
+      9.8510 * 10^-3];
+
+  H = [1, 0; 0 1; 1 1];
+
+  Q = 1;
+  R = diag([0.01 0.01 0.01]);
+  N = 1001;
+  dt = 0.01;
+  time = (0:N-1)' * dt;
+
+  x0_true = [1; 1];
+
+  rng(42)
+  w = sqrt(Q) * randn(N,1);
+  v = sqrtm(R) * randn(3, N);
+  x_true = zeros(2, N);
+  x_true(:,1) = x0_true;
+
+  for k = 1:N-1
+      x_true(:,k+1) = A * x_true(:,k) + B * w(k);
+  end
+
+  y_meas = H * x_true + v;
+  function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
+      runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
+      x_hat_minus = zeros(2, N);
+      x_hat_plus = zeros(2, N);
+      P_minus = zeros(2,2,N);
+      P_plus = zeros(2,2,N);
+
+      x_hat_minus(:,1) = x_hat0_minus;
+      P_minus(:, :, 1) = P0_minus;
+      for k=1:N
+          Kk = P_minus(:, :, k) * H' / (H * P_minus(:, :, k) * H' + R);
+          x_hat_plus(:, k) = x_hat_minus(:, k) + Kk * (y_meas(:, k) - H * x_hat_minus(:, k));
+          P_plus(:, :, k) = (eye(2) - Kk * H) * P_minus(:, :, k);
+
+          if k < N
+              x_hat_minus(:, k+1) = A * x_hat_plus(:, k);
+              P_minus(:, :, k+1) = A * P_plus(:, :, k) * A' + B * Q * B';
+          end
+      end
+  end
+
+  [x_hat_plus_1, P_plus_1] = runKalmanFilter(A, B, H, Q, R, y_meas, [1.5; 0.5], [0.0001 0; 0 0.0001], N);
+  [x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [50; -50], [100 0; 0 100], N);
+  [x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [2; -1], [0.5 0.1; 0.1 0.5], N);
+  [x_hat_plus_4, P_plus_4] = runKalmanFilter(A, B, H, Q, R, y_meas, [1; 1], [0.001 0; 0 0.001], N);
+
+  error_1 = x_true - x_hat_plus_1;
+  error_2 = x_true - x_hat_plus_2;
+  error_3 = x_true - x_hat_plus_3;
+  error_4 = x_true - x_hat_plus_4;
+
+  dist1 = sqrt(sum(error_1.^2, 1));
+  dist2 = sqrt(sum(error_2.^2, 1));
+  dist3 = sqrt(sum(error_3.^2, 1));
+  dist4 = sqrt(sum(error_4.^2, 1));
+
+  figure;
+  plot(time, dist1, 'r-', 'LineWidth', 1.5); hold on;
+  plot(time, dist2, 'g-', 'LineWidth', 1.5);
+  plot(time, dist3, 'b-', 'LineWidth', 1.5);
+  plot(time, dist4, 'm-', 'LineWidth', 1.5);
+  xlabel('Time (s)');
+  ylabel('Euclidean Distance');
+  title('Distance Between True and Estimated State - Interesting Scenarios');
+  legend(...
+      'Case 1: Slightly Wrong + Overconfident', ...
+      'Case 2: Very Wrong + Very Uncertain', ...
+      'Case 3: Somewhat Wrong + Realistic', ...
+      'Case 4: Perfect + Overconfident', ...
+      'Location', 'best');
+  grid on;
+
+  figure('Position', [80, 80, 900, 1200]);
+
+  subplot(4,2,1);
+  sigma_bounds_1_state1 = 3 * squeeze(sqrt(P_plus_1(1,1,:)));
+  plot(time, error_1(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 1: State 1 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,2);
+  sigma_bounds_1_state2 = 3 * squeeze(sqrt(P_plus_1(2,2,:)));
+  plot(time, error_1(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 1: State 2 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,3);
+  sigma_bounds_2_state1 = 3 * squeeze(sqrt(P_plus_2(1,1,:)));
+  plot(time, error_2(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 2: State 1 Error (x0=[50; -50], P=[100 0; 0 100])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,4);
+  sigma_bounds_2_state2 = 3 * squeeze(sqrt(P_plus_2(2,2,:)));
+  plot(time, error_2(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 2: State 2 Error (x0=[50; -50], P=[100 0; 0 100])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,5);
+  sigma_bounds_3_state1 = 3 * squeeze(sqrt(P_plus_3(1,1,:)));
+  plot(time, error_3(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 3: State 1 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,6);
+  sigma_bounds_3_state2 = 3 * squeeze(sqrt(P_plus_3(2,2,:)));
+  plot(time, error_3(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 3: State 2 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,7);
+  sigma_bounds_4_state1 = 3 * squeeze(sqrt(P_plus_4(1,1,:)));
+  plot(time, error_4(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 4: State 1 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,8);
+  sigma_bounds_4_state2 = 3 * squeeze(sqrt(P_plus_4(2,2,:)));
+  plot(time, error_4(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 4: State 2 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
+  legend('Error', '3sigma Bound', 'Location', 'best');
+  grid on;
+
+\end{lstlisting}
+
+\subsection{Matlab code for exercise 8}
+
+\begin{lstlisting}[style=matlabstyle]
+  % Exc 8
+
+  clear; close all; clc;
+  rng(42);
+
+  dt = 1; 
+  T = 60; 
+  N = T/dt;
+
+  omega_true = [0.001; 0.002; 0.0005]; 
+
+  r1 = [1;0;0]; r2 = [0;1;0]; r3 = [0;0;1];
+  r = [r1, r2, r3];
+
+  function S = skew_symmetric(v)
+      S = [0, -v(3), v(2); v(3), 0, -v(1); -v(2), v(1), 0];
+  end
+
+  function q_out = quat_multiply(q1, q2)
+      v1 = q1(1:3); s1 = q1(4);
+      v2 = q2(1:3); s2 = q2(4);
+      q_out = [s1*v2 + s2*v1 + cross(v1, v2); s1*s2 - dot(v1, v2)];
+      q_out = q_out / norm(q_out);
+  end
+
+
+
+  function R = quat_to_dcm(q)
+      q0 = q(4); q1 = q(1); q2 = q(2); q3 = q(3);
+      R = [1-2*(q2^2+q3^2), 2*(q1*q2-q0*q3), 2*(q1*q3+q0*q2);
+          2*(q1*q2+q0*q3), 1-2*(q1^2+q3^2), 2*(q2*q3-q0*q1);
+          2*(q1*q3-q0*q2), 2*(q2*q3+q0*q1), 1-2*(q1^2+q2^2)];
+  end
+
+  function q_conj = quat_conjugate(q)
+      q_conj = [-q(1:3); q(4)];
+  end
+
+  function euler = quat_to_euler(q)
+      q0 = q(4); q1 = q(1); q2 = q(2); q3 = q(3);
+      
+      sinr_cosp = 2 * (q0 * q1 + q2 * q3);
+      cosr_cosp = 1 - 2 * (q1 * q1 + q2 * q2);
+      roll = atan2(sinr_cosp, cosr_cosp);
+      sinp = 2 * (q0 * q2 - q3 * q1);
+      if abs(sinp) >= 1
+          pitch = sign(sinp) * pi/2;
+      else
+          pitch = asin(sinp);
+      end
+      
+      siny_cosp = 2 * (q0 * q3 + q1 * q2);
+      cosy_cosp = 1 - 2 * (q2 * q2 + q3 * q3);
+      yaw = atan2(siny_cosp, cosy_cosp);
+      
+      euler = [roll; pitch; yaw];
+  end
+
+  function q_out = exact_attitude(q0, omega, t)
+      omega_norm = norm(omega);
+      if omega_norm > 1e-12
+          axis = omega / omega_norm;
+          angle = omega_norm * t;
+          q_rot = [axis * sin(angle/2); cos(angle/2)];
+          q_out = quat_multiply(q0, q_rot);
+      else
+          q_out = q0;
+      end
+      q_out = q_out / norm(q_out);
+  end
+
+  function [q_est, beta_est, P] = attitude_ekf_corrected(r, q0, beta0, P0, gyro_meas, star_meas, dt, sigma_v, sigma_u, sigma_star)
+      r1 = r(:,1); r2 = r(:,2); r3 = r(:,3);
+      N = size(gyro_meas, 2);
+      q_est = zeros(4, N);
+      beta_est = zeros(3, N);
+      P = zeros(6, 6, N);
+      
+      q_est(:,1) = q0;
+      beta_est(:,1) = beta0;
+      P(:,:,1) = P0;
+      
+      for k = 1:N-1
+          omega_est = gyro_meas(:,k) - beta_est(:,k);
+          omega_norm = norm(omega_est);
+          if omega_norm > 1e-12
+              psi = sin(0.5 * omega_norm * dt) * omega_est / omega_norm;
+              cos_term = cos(0.5 * omega_norm * dt);
+              
+              Omega = [cos_term * eye(3) - skew_symmetric(psi),  psi;
+                      -psi',                                 cos_term];
+              
+              q_est(:,k+1) = Omega * q_est(:,k);
+          else
+              q_est(:,k+1) = q_est(:,k);
+          end
+          q_est(:,k+1) = q_est(:,k+1) / norm(q_est(:,k+1));
+          if q_est(4,k+1) < 0
+              q_est(:,k+1) = -q_est(:,k+1); 
+          end
+          beta_est(:,k+1) = beta_est(:,k);
+          
+          omega_norm = norm(omega_est);
+          if omega_norm > 1e-12
+              omega_skew = skew_symmetric(omega_est);
+              Phi11 = eye(3) - omega_skew * sin(omega_norm * dt)/omega_norm + ...
+                      omega_skew^2 * (1 - cos(omega_norm * dt))/(omega_norm^2);
+              Phi12 = omega_skew * (1 - cos(omega_norm * dt))/(omega_norm^2) - ...
+                      eye(3) * dt - omega_skew^2 * (omega_norm * dt - sin(omega_norm * dt))/(omega_norm^3);
+          else
+              Phi11 = eye(3);
+              Phi12 = -eye(3) * dt;
+          end
+          Phi21 = zeros(3,3);
+          Phi22 = eye(3);
+          
+          Phi = [Phi11, Phi12; Phi21, Phi22];
+          
+    
+          Q11 = (sigma_v^2 * dt) * eye(3);
+          Q12 = zeros(3,3);
+          Q22 = (sigma_u^2 * dt) * eye(3);
+          Qd = [Q11, Q12; Q12', Q22];
+          
+          P_pred = Phi * P(:,:,k) * Phi' + Qd;
+
+          if ~isempty(star_meas) && k < size(star_meas, 2)
+              q_pred = q_est(:,k+1);
+              R_pred = quat_to_dcm(q_pred);
+              
+              H = zeros(9, 6);
+              H(1:3, 1:3) = skew_symmetric(R_pred * r1);
+              H(4:6, 1:3) = skew_symmetric(R_pred * r2);
+              H(7:9, 1:3) = skew_symmetric(R_pred * r3);
+              
+              R_meas = (10 * sigma_star)^2 * eye(9);
+
+              S = H * P_pred * H' + R_meas;
+              reg_factor = max(1e-6, 1e-4 * dt) * eye(size(S));
+              S = S + reg_factor;
+              K = P_pred * H' / (S + 1e-8 * eye(size(S))); 
+              
+              b1_pred = R_pred * r1;
+              b2_pred = R_pred * r2; 
+              b3_pred = R_pred * r3;
+              y_pred = [b1_pred; b2_pred; b3_pred];
+              
+              residual = star_meas(:,k+1) - y_pred;
+              
+              if norm(residual) > 10
+                  fprintf('k=%d: Large residual = %.3f, limiting...\n', k, norm(residual));
+                  residual = residual / norm(residual) * 0.1; 
+              end
+              delta_x = K * residual;
+              
+              max_att_update = 0.01 * sqrt(dt); 
+              max_bias_update = 1e-8 * dt; 
+              
+              delta_x(1:3) = sign(delta_x(1:3)) .* min(abs(delta_x(1:3)), max_att_update);
+              delta_x(4:6) = sign(delta_x(4:6)) .* min(abs(delta_x(4:6)), max_bias_update);
+              
+              delta_alpha = delta_x(1:3);
+              delta_beta = delta_x(4:6);
+              
+              P_upd = (eye(6) - K * H) * P_pred;
+              P_upd = 0.5 * (P_upd + P_upd');
+              P_upd = P_upd + 1e-12 * eye(6);
+              P(:,:,k+1) = 0.5 * (P_upd + P_upd');
+              
+              delta_q = [0.5 * delta_alpha; 1];
+              delta_q = delta_q / norm(delta_q);
+              q_est(:,k+1) = quat_multiply(delta_q, q_pred);
+              q_est(:,k+1) = q_est(:,k+1) / norm(q_est(:,k+1));
+              if q_est(4,k+1) < 0
+                  q_est(:,k+1) = -q_est(:,k+1);
+              end
+
+              
+              beta_est(:,k+1) = beta_est(:,k+1) + delta_beta;
+              
+          else
+              P(:,:,k+1) = P_pred;
+          end
+      end
+  end
+
+  scenarios = {
+      struct('sigma_u', 1e-5, 'sigma_v', 1e-4, 'name', 'Baseline'),
+      struct('sigma_u', 1e-5, 'sigma_v', 2e-4, 'name', 'High_sigma_v'), 
+      struct('sigma_u', 2e-5, 'sigma_v', 1e-4, 'name', 'High_sigma_u')
+  };
+
+  sigma_star = 0.1 * pi/180;
+
+  results = cell(1,3);
+
+  for scenario_idx = 1:3 
+      scenario = scenarios{scenario_idx};
+      fprintf('\n=== Running scenario: %s ===\n', scenario.name);
+      
+      q_true_history = zeros(4, N);
+      beta_true_history = zeros(3, N);
+      euler_true_history = zeros(3, N);
+      
+      q_true_history(:,1) = [0; 0; 0; 1];
+      true_beta_rad = [0.1; 0.1; 0.1] * pi/180/3600; 
+      
+      for k = 1:N
+          if k == 1
+              q_true_history(:,k) = [0; 0; 0; 1];
+          else
+              q_true_history(:,k) = exact_attitude(q_true_history(:,k-1), omega_true, dt);
+          end
+          beta_true_history(:,k) = true_beta_rad;
+          euler_true_history(:,k) = quat_to_euler(q_true_history(:,k));
+      end
+      
+      gyro_meas = zeros(3, N);
+      for k = 1:N
+          eta_v = scenario.sigma_v * randn(3,1);
+          gyro_meas(:,k) = omega_true + beta_true_history(:,k) + eta_v;
+      end
+      
+      star_meas = zeros(9, N);
+      for k = 1:N
+          R_true = quat_to_dcm(q_true_history(:,k));
+          noise = sigma_star * randn(9,1);
+          
+          b1 = R_true * r1 + noise(1:3);
+          b2 = R_true * r2 + noise(4:6);
+          b3 = R_true * r3 + noise(7:9);
+          
+          star_meas(:,k) = [b1/norm(b1); b2/norm(b2); b3/norm(b3)];
+      end
+      
+      q0_est = q_true_history(:,1); 
+      beta0_est = [0; 0; 0];
+
+      P0a = (0.1 * pi/180)^2 * dt; 
+      P0b = (0.1 * pi/180/3600)^2 * dt;   
+      P0 = diag([P0a, P0a, P0a, P0b, P0b, P0b]);
+      
+      [q_est, beta_est, P] = attitude_ekf_corrected(r, q0_est, beta0_est, P0, gyro_meas, star_meas, dt, ...
+                                        scenario.sigma_v, scenario.sigma_u, sigma_star);
+      
+      attitude_errors_deg = zeros(1, N);
+      attitude_error_norms = zeros(1, N);
+      euler_errors_deg = zeros(3, N);
+      bias_errors_deg_hr = zeros(3, N);
+      omega_errors_rad = zeros(3, N);
+      omega_error_norms = zeros(1, N);
+      
+      for k = 1:N
+          q_err = quat_multiply(quat_conjugate(q_est(:,k)), q_true_history(:,k));
+          angle_err = 2 * acos(abs(q_err(4))) * 180/pi;
+          attitude_errors_deg(k) = min(angle_err, 180-angle_err); 
+          
+          attitude_error_norms(k) = norm(q_err(1:3)) * 180/pi;
+          
+          euler_est = quat_to_euler(q_est(:,k));
+          euler_errors_deg(:,k) = (euler_est - euler_true_history(:,k)) * 180/pi;
+          
+          bias_error_rad = beta_est(:,k) - beta_true_history(:,k);
+          bias_errors_deg_hr(:,k) = bias_error_rad * (180/pi * 3600);
+          omega_est = gyro_meas(:,k) - beta_est(:,k);
+          omega_errors_rad(:,k) = omega_est - omega_true;
+          omega_error_norms(k) = norm(omega_errors_rad(:,k)) * 180/pi; 
+      end
+      
+      attitude_variances = zeros(3, N);
+      bias_variances_deg_hr = zeros(3, N);
+      
+      for k = 1:N
+          attitude_variances(:,k) = diag(P(1:3,1:3,k)) * (180/pi)^2;
+          bias_variances_deg_hr(:,k) = diag(P(4:6,4:6,k)) * (180/pi * 3600)^2;
+      end
+      
+      results{scenario_idx} = struct();
+      results{scenario_idx}.name = scenario.name;
+      results{scenario_idx}.attitude_errors_deg = attitude_errors_deg;
+      results{scenario_idx}.attitude_error_norms = attitude_error_norms;
+      results{scenario_idx}.euler_errors_deg = euler_errors_deg;
+      results{scenario_idx}.bias_est_deg_hr = beta_est * (180/pi * 3600);
+      results{scenario_idx}.bias_errors_deg_hr = bias_errors_deg_hr;
+      results{scenario_idx}.attitude_variances = attitude_variances;
+      results{scenario_idx}.bias_variances_deg_hr = bias_variances_deg_hr;
+      results{scenario_idx}.P = P;
+      results{scenario_idx}.omega_error_norms = omega_error_norms;
+      results{scenario_idx}.omega_errors_rad = omega_errors_rad;
+      
+      fprintf('Final attitude error: %.4f deg\n', attitude_errors_deg(end));
+      fprintf('Final attitude error norm: %.4f deg\n', attitude_error_norms(end));
+      fprintf('Final bias errors: [%.3f, %.3f, %.3f] deg/hr\n', bias_errors_deg_hr(:,end));
+  end
+
+  time_minutes = (0:N-1)*dt/60;
+
+  colors = {'b', 'r', 'g'};
+  scenario_names = {scenarios{1}.name, scenarios{2}.name, scenarios{3}.name};
+
+  figure('Position', [100, 100, 1200, 800]);
+
+  subplot(2,2,1);
+  hold on;
+  for idx = 1:3
+      plot(time_minutes, results{idx}.omega_error_norms, colors{idx}, 'LineWidth', 2, 'DisplayName', scenario_names{idx});
+  end
+  ylabel('Angular Velocity Error Norm (deg/s)');
+  xlabel('Time (min)');
+  title('Norms: estimated vs true angular velocities');
+  legend('show');
+  grid on;
+
+  subplot(2,2,2);
+  hold on;
+  for idx = 1:3
+      bias_errors = results{idx}.bias_errors_deg_hr;
+      bias_error_norms = sqrt(sum(bias_errors.^2, 1));
+      plot(time_minutes, bias_error_norms, colors{idx}, 'LineWidth', 2, 'DisplayName', scenario_names{idx});
+  end
+  ylabel('Bias error borm (deg/hr)');
+  xlabel('Time (min)');
+  title('Norms: actual vs estimated gyro bias');
+  legend('show');
+  grid on;
+
+  subplot(2,2,3);
+  hold on;
+  for idx = 1:3
+      plot(time_minutes, results{idx}.attitude_errors_deg, colors{idx}, 'LineWidth', 2, 'DisplayName', scenario_names{idx});
+  end
+  ylabel('Attitude Error (deg)');
+  xlabel('Time (min)');
+  title('Attitude norm comparison');
+  legend('show');
+  grid on;
+
+  subplot(2,2,4);
+  final_att_errors = [results{1}.attitude_errors_deg(end), results{2}.attitude_errors_deg(end), results{3}.attitude_errors_deg(end)];
+  final_bias_errors = [mean(abs(results{1}.bias_errors_deg_hr(:,end))), ...
+                      mean(abs(results{2}.bias_errors_deg_hr(:,end))), ...
+                      mean(abs(results{3}.bias_errors_deg_hr(:,end)))];
+  bar_data = [final_att_errors; final_bias_errors]';
+  bar(1:3, bar_data);
+  ylabel('Final Error');
+  xlabel('Scenario');
+  title('Final performance comparison');
+  legend('Attitude Error (deg)', 'Bias Error (deg/hr)', 'Location', 'best');
+  set(gca, 'XTickLabel', scenario_names);
+  grid on;
+\end{lstlisting}
+
 
 
 \end{questions}
