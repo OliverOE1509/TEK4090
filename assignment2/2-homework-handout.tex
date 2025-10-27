@@ -8,6 +8,29 @@
 % \chead{\hline} % Un-comment to draw line below header
 \thispagestyle{empty}   %For removing header/footer from page 1
 
+\usepackage{listings}
+\usepackage{xcolor}
+
+% MATLAB style
+\lstdefinestyle{matlabstyle}{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green},
+    numbers=left,
+    frame=single
+}
+
+% Python style  
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green},
+    numbers=left,
+    frame=single
+}
+
 \usepackage{mathtools}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \usepackage{gensymb}
@@ -293,6 +316,11 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
             \frac{ f(c)-f(a) }{ c-a } \leq \frac{ f(b)-f(a) }{ b-a } \leq \frac{ f(b)-f(c) }{ b-c }
         \]
         Now we can just replace c with x, becuase this inequality is valid $ \forall x \in \left( a,b \right)  $ 
+
+        \begin{center}
+          \includegraphics[width=0.8\linewidth]{./figures/Convex_properties.png}\\
+          \textbf{Fig.~1:} Building model schematic
+        \end{center}
         
         
         
@@ -312,12 +340,12 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
         We know from a definition of derivatives in our calculus book, that 
 
         \[
-            f´(a) = \lim_{x \to a} \frac{ f(x)-f(a) }{ x-a }
+            f'(a) = \lim_{x \to a} \frac{ f(x)-f(a) }{ x-a }
         \]
         . Then since $ x-b \le 0 $ we have that 
 
         \[
-            f´(b) = \lim_{x \to b} \frac{ f(b)-f(x) }{ b-x }
+            f'(b) = \lim_{x \to b} \frac{ f(b)-f(x) }{ b-x }
         \]
 
         From this we get what we wanted to prove, if we allow x to approach both a and b respectively
@@ -327,18 +355,26 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     \part Suppose $f$ is twice differentiable. Use the result in (c) to show that $f''(a) \geq 0$ and $f''(b) \geq 0$.
 
     \begin{solution}
-      Assume that f is convex, then, $ \forall c \in \left( a, b \right)  $ we have $ \frac{ f(c)-f(a) }{ c-a }  \leq \frac{ f(b)-f(c) }{ b-c }$. From the mean value theorem, $ \exists c_1, c_2 \in \left( a, c \right), \left( c, b \right)   $  s.t. $ \frac{ f(c)-f(a) }{ c-a } =f´(c_1) $ and $ \frac{ f(b)-f(c) }{ b-c } = f´(c_2) $
+      From c), we got that $ f'(a) \leq \frac{ f(b) - f(a) }{ b-a }  \leq f'(b)$. Now the second derivative becomes 
       
-      Since we have that $ a /le b $ and f is convex, $ f´(c_1) \leq f´(c_2) $, and we get that $ f´´(x) \geq 0 \forall x \in \left( a,b \right)  $ 
+      \[
+          f''(a) = \lim_{h \to 0}  \frac{ f'(a+h) - f'(a) }{ h }
+      \]
+      Now applying the mean value theorem to the interval $ \left[ a, a+h \right]  $, we get $ \exists $ som $ c \in \left( a, a+h \right)  $ s.t.
+      \[
+          f'(c) = \frac{ f(a+h) - f(a) }{ h }
+      \]
+      But from our inequality with $ x = a+h $, we get that $ f'(a) \leq f'(c)$. Since $ c > a $ and $ f'(c) \geq f'(a)$, the rate of change is non decreasing at $ a $. Therefore, 
+      \[
+          f'(a+h) \geq f'(a) 
+      \]
+      which implies that $ \frac{ f'(a+h) - f'(a) }{ h } \geq 0 $ which is what we wanted to show. A similar argument is made for $ f''(b) $  
+         
     \end{solution}
   \end{parts}
 \end{question}
 
-\begin{solution}
-  \begin{parts}
-    \part 
-  \end{parts}
-\end{solution}
+
 
 \begin{question}[20]
   (LQR for Buildings)
@@ -445,22 +481,24 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     
     This makes. A to be a banded matrix. Since all rooms are adjacent to room 5, the matrix A becomes 
 
-    \[
-        A = \begin{bmatrix}
+    \begin{align*}
+      A &= \begin{bmatrix}
             -  \sum_{ j }^{  } \frac{ h_{1j} }{ C_1 } & \frac{ h_{12} }{ C_1 } &0 &0 &\frac{ h_{15} }{ C_1 } \\
             \frac{ h_{21} }{ C_2 } &  -  \sum_{ j }^{  } \frac{ h_{2j} }{ C_2 } & \frac{ h_{23} }{ C_2 } & 0 & \frac{ h_{25} }{ C_2 } \\
             0 &  \frac{ h_{32} }{ C_3 } &  -  \sum_{ j }^{  } \frac{ h_{3j} }{ C_3 } & \frac{ h_{34} }{ C_3 } & \frac{ h_{35} }{ C_3 } \\
             0 & 0 & \frac{ h_{43} }{ C_4 } &  -  \sum_{ j }^{  } \frac{ h_{4j} }{ C_4 } & \frac{ h_{45} }{ C_4 } \\
             \frac{ h_{51} }{ C_5 } & \frac{ h_{52} }{ C_5 } & \frac{ h_{53} }{ C_5 } & \frac{ h_{54} }{ C_5 } & -  \sum_{ j }^{  } \frac{ h_{5j} }{ C_5 } 
         \end{bmatrix}\\
-        = \begin{bmatrix}
+        &= \begin{bmatrix}
             -30 & 10 & 0 &0&10\\
             10&-40&10&0&10\\
             0&10&-40&10&10\\
             0&0&10&-30&10\\
             10&10&10&10&-50
         \end{bmatrix}  
-    \]
+    \end{align*}
+    
+      
     Since there are three actuators in rooms 1, 2 and 4, the B matrix is written as 
 
     \[
@@ -629,8 +667,8 @@ Hint: read \S6.3 in Lewis, Syrmos, \& Vraibie for some relevant example problems
     Now the plot looks like this, and it should include everything demanded
     
     \begin{center}
-    \includegraphics[width=0.5\linewidth]{./figures/Exc_4c_bigQ_smallR.pdf}\\
-    \textbf{Fig.~2:} Building model schematic
+    \includegraphics[width=1\linewidth]{./figures/Exc4d_buildingDynamics.pdf}\\
+    \textbf{Fig.~3:} Building model schematic
     \end{center}
 
   
@@ -769,31 +807,488 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
  \question[10] \textit{Crassidis \& Junkins} Problem 7.4
 \begin{solution}
 
+  Quick note, Im just ramsing up the important math at the beginning. You can skip to where I say 'Furhtermore' for direct results from simulation. Instead of using euler angles, a nice representation of attitude is using quaternions. 
+
+  \[
+      \vec{q} = \left[ q_1, q_2, q_3, q_4 \right] = \left[ \epsilon, q_4 \right]  
+  \]
+  where $ \epsilon $ is the vector part. The kinematics of the quaternion follows 
+  $$ \frac{ dq }{ dt }= \frac{ 1 }{ 2 } \Omega(\vec{\omega}) q $$
+  where $ \omega $ is the angular velocity. From mechanics, the velocity of a particle rotating about an axis, is derived by $ \vec{v} = \vec{\omega} \times \vec{r} $. Not important here. Just meant to illustrate that its a measure of speed, given by radians per unit of time. 
+
+  For the gyro measurements, we used a first order markov process
+  \[
+      \vec{\omega}_measured = \omega_true + \beta + \eta_v  \tag{the measurement noise}
+  \]
+  \[
+      \frac{ d\beta }{ dt } = \eta_u \tag{bias drift noise} 
+  \]
+  where beta is the gyro bias vector. 
+  
+
+  For the error state formulation, we use the multiplictive error to maintain the quaternion normalization constraint, $ \delta \vec{q} = \vec{q} \otimes \hat{\vec{q}}^{-1} $ 
+  
+  The error state dynamics are given as linearized error dynamics, 
+  \begin{itemize}
+    \item $ \frac{ d \delta \alpha }{ dt } = - \left[ \omega \times \right] \delta \alpha - \Delta \beta  - \eta_v $ 
+    \item $ \frac{ d \Delta \beta }{ dt } = \eta_u $ 
+  \end{itemize}
+
+  where $ \left[  \omega \times \right]  $ is the skew symmetric matrix given by $ \begin{bmatrix}
+      0 & -\omega_3 & \omega_2 \\
+      \omega_3 & 0 & - \omega_1 \\
+      -\omega_2 & \omega_1 & 0
+  \end{bmatrix}  $  
+
+
+  And now for the extended kalman filter implementation, we start by defining the state vector $ \vec{x} = \left[ \delta \alpha, \Delta \beta^T \right]  $. For each step in our discretized timeline, we propagate the new quaternion as 
+  \[
+      \hat{q}_{k+1}^- = exp \left( \frac{ 1 }{ 2 } \Omega \left( \hat{\omega}_k^+ \right) \Delta t  \right) \hat{q}_k^+ 
+  \]
+  where the exponential is computed as 
+  $$ exp \left( \frac{ 1 }{ 2 } \Omega (\omega) \delta t \right) = \begin{bmatrix}
+      cos \left(  1/2 \norm{\omega}_{}^{} \Delta t \right) I - \left[ \phi \times \right] & \psi \\
+      -\psi^T  & cos \left( 1/2 \norm{\omega}_{}^{} \Delta t \right)  
+  \end{bmatrix}   $$
+  with $ \psi = sin \left( 1/2 \norm{\omega}_{}^{} \Delta t \right) * \frac{ \omega }{ \norm{\omega}_{}^{}  }  $ 
+
+
+  The process noise covariation (eq. 7.46) is given by $$ Q = \begin{bmatrix}
+      \left( \sigma_v^2 \Delta t + \frac{ 1 }{ 2 } \sigma_u^2 \Delta t^3 \right) & \left(  \frac{ 1 }{ 2 } \sigma _u^2 \Delta t^3 \right) * I \\
+      \left(  \frac{ 1 }{ 2 } \sigma_u^2 \Delta t^2 \right) I & \left(  \sigma_u^2 \Delta t \right) I  
+  \end{bmatrix}  $$
+
+  And is in this case a $ 6 \times 6 $ shaped matrix 
+
+
+  The sensor measurement updates are given by 
+  \[
+      b_i = A(q)r_i + v_i
+  \]
+  for i = 1,2,3. $ A(q) $ is the attitude matrix and $ r_i $ are the reference vectors. The measurement matrix is given by 
+  \[
+      H = \begin{bmatrix}
+          \left[ A(\hat{q}) r_1 \times \right] & 0 \\
+          \left[ A(\hat{q}) r_2 \times \right] & 0 \\ 
+          \left[ A(\hat{q}) r_2 \times \right] & 0 \\
+    \end{bmatrix} 
+  \]
+  where again $ \left[ v \times \right]  $ is the skew symmetric matrix.
+  
+  Furthermore, for the implementation strategy, we assume a constant angular velocity, and measurements are made with gyros that contain a bias. The angular velocity is given by $ \omega_{true} = \left[ 0.001, 0.002, 0.0005 \right]$ rad /s. This creates a slow and accumulating rotation of all the axises, which is an attempt of more realistic dynamics. This is implemented with the function exact attitude. I also assume constant gyro biases
+  $ \beta_{true} = \left[ 0.1, 0.1, 0.1 \right] \text{deg/hr} = \left[ 4.848*10^{-7}, 4.848*10^{-7}, 4.848*10^{-7} \right]$ rad/s
+
+  The sampling rate for the gyroscope is 1 Hz, which makes $ dt = 1  $ second. 
+
+
+  Now we can start analyzing the filter performance
+
+  \subsection{baseline scenario}
+
+  This scenario represents balanced and realistic sensor performance.
+  \begin{itemize}
+  \item $ \sigma_u = 1* 10^{-5} $ rad/s/$ \sqrt{ \text{Hz} } $
+  \item $ \sigma_v = 1* 10^{-4} $ rad/s/$ \sqrt{ \text{Hz} } $  
+  \end{itemize}
+
+  \subsection{high $ \sigma_v $ }
+  This scenario tests sensitivity to gyro measurement noise
+  \begin{itemize}
+  \item $ \sigma_u = 1* 10^{-5} $ rad/s/$ \sqrt{ Hz } $
+  \item $ \sigma_v = 2* 10^{-4} $ rad/s/$ \sqrt{ Hz } $  
+  \end{itemize}
+
+  \subsection{high $ \sigma_u $ }
+  This scenario tests sensitivity to bias instability
+  \begin{itemize}
+  \item $ \sigma_u = 2* 10^{-5} $ rad/s/$ \sqrt{ Hz } $
+  \item $ \sigma_v = 1* 10^{-4} $ rad/s/$ \sqrt{ Hz } $  
+  \end{itemize}
+  
+  
+  The following plot $ (dt=1) $ 
   \begin{center}
-  \includegraphics[width=0.75\linewidth]{figures/Exc74.png}
+  \includegraphics[width=0.75\linewidth]{figures/gyro_attitude_est_plot1.pdf}
   \end{center}
 
-  The updated quaternion is found using $ \hat{q}_{k+1}^- = \bar{\Omega} \left( \hat{\omega}_k^+ \right) \hat{q}_k^+  $ 
+  suggests that the filter is more sensitive to increases in measurement noise, than process noise. $ \sigma_u $ was related to the gyro bias drift, and $ \sigma_v $ to the gyro measurement noise. The difference in angular velocities estimates seem to be really stable. If I decrease dt (thus increasing discretization rate) the plot of norms of angular velocities becomes unclear. For the attitude error and gyro bias, the errors seem to diverge more, with the high measurement noise scenario diverging in both cases. So the readings from our sensor, contain a significant amont of random unpredictable error. It does not seem that any increase in process noise has any significant impact on performance, as the norm stays relatively low, at least compared to measurement noise. This is also illustrated by the final comparison plot
 
-  Discrete propagation of the covariance equation is $ P_{k+1}^- = \Phi_k P_k^+ \Phi_k^T + \gamma_k Q_k \gamma_k^T $ 
 
-  Our task is to estimate the attitute of a spacecraft in orbit, using the Extended Kalman Filter (EKF). The spacecraft attitude, represented as a quaternion. 
 
-  The attitude dynamics are governed by the system model 
-  \[
-      \dot{q} = \frac{ 1 }{ 2 } \Omega(\vec{\omega})\vec{q}
-  \]
-  with bias dynamics
-
-  \[
-      \dot{\vec{b}} = \vec{\eta}_u
-  \]
-
-  Where $\boldsymbol{\eta}_v \sim \mathcal{N}(0, \sigma_v^2 \mathbf{I}_3)$ is the gyro measurement noise and $\boldsymbol{\eta}_u \sim \mathcal{N}(0, \sigma_u^2 \mathbf{I}_3)$ is the gyro bias drift noise
-  
-  
+   
 
 \end{solution}
+
+\section{appendix}
+
+
+\subsection{Python code for Exc 3b}
+
+
+
+\begin{lstlisting}[style=pythonstyle]
+  import matplotlib.pyplot as plt
+  import numpy as np
+
+  x = np.linspace(-5, 5, 100)
+
+  def plot_convex(a, b, f):
+      if b <= a:
+          raise ValueError("b must be greater than a")
+      
+      y = f(x)
+      c = np.random.choice(np.linspace(a, b, 10))
+      
+      k = (f(b) - f(a)) / (b - a)  
+      k_1 = (f(c) - f(a)) / (c - a)  
+      k_2 = (f(b) - f(c)) / (b - c)  
+      
+      secant = f(a) + k * (x - a)  
+      secant_left = f(a) + k_1 * (x - a)  
+      secant_right = f(c) + k_2 * (x - c)  
+      
+      plt.figure(figsize=(8, 6))
+      plt.plot(x, y, label=r"$f(x)$", color="blue", linewidth=2)
+      plt.plot(x, secant, "--", color="orange", alpha=0.8)
+      plt.plot(x, secant_left, "--", color="green", alpha=0.8)
+      plt.plot(x, secant_right, "--", color="purple", alpha=0.8)
+      
+      plt.scatter([a, b, c], [f(a), f(b), f(c)], color="red", s=50)
+      plt.annotate(f"a=({a:.1f}, {f(a):.1f})", (a, f(a)))
+      plt.annotate(f"b=({b:.1f}, {f(b):.1f})", (b, f(b)))
+      plt.annotate(f"c=({c:.1f}, {f(c):.1f})", (c, f(c)))
+      
+      x_fill = np.linspace(a, b, 50)
+      y_fill = f(x_fill)
+      secant_fill = f(a) + k * (x_fill - a)
+      plt.fill_between(x_fill, y_fill, secant_fill, alpha=0.2, 
+              color='red', label='Area showing convexity')
+      
+      plt.title("Illustration of Convex Function Properties")
+      plt.xlabel("x")
+      plt.ylabel("f(x)")
+      plt.legend()
+      plt.grid(True, linestyle='--', alpha=0.6)
+      plt.axis('equal')
+      plt.show()
+
+  plot_convex(-2, 3, lambda x: x**2)
+
+
+
+
+\end{lstlisting}
+
+\subsection{Matlab code for exercise 4}
+
+\begin{lstlisting}[style=matlabstyle]
+  nRooms = 5;
+  nControls = 3;
+  nMeasurements = 2;
+
+  q = 1e4;  
+  r = 1e2;  
+  x_bar = 20 * ones(nRooms, 1);
+  T = 86400;
+  t = linspace(0, T, 1000);
+  c = 1/(1.08e6);
+
+  A = [-30 10 0 0 10;
+      10 -40 10 0 10;
+      0 10 -40 10 10;
+      0 0 10 -30 10;
+      10 10 10 10 -50] * c;
+
+  B = [1 0 0;
+      0 1 0;
+      0 0 0;
+      0 0 1;
+      0 0 0] * c;
+
+  C = [0 1 0 0 0;   
+      0 0 0 1 0];   
+
+  Q = q * eye(nRooms);
+  R = r * eye(nControls);
+  [K, P, E] = lqr(A, B, Q, R);
+
+  if rank(obsv(A, C)) == nRooms
+      fprintf('System is observable.\n');
+  else
+      fprintf('System is NOT observable\n');
+  end
+
+  obs_poles_multiplier = 2;  
+  desired_obs_poles = obs_poles_multiplier * max(real(E)) * linspace(1, 1.5, nRooms);
+  L = place(A', C', desired_obs_poles)';
+
+  B_ambient = [10; 10; 10; 10; 10] * c;
+  D_disturbance = eye(5) * c;
+  x_a = @(t) 20 + 5*sin(2*pi*t/86400);
+  d_func = @(t) max(0, 500 * sin(2 * pi*t/86400) - 300);
+
+  ssign = @(x) (x>0) - (x<0);
+  x0_true = zeros(nRooms, 1);
+  for i = 1:nRooms
+      x0_true(i) = 15 - i * ssign((-1)^i);
+  end
+  z0_true = x0_true - x_bar;
+
+  x0_est = 18 * ones(nRooms, 1);  
+  z0_est = x0_est - x_bar;
+
+  z0_aug = [z0_true; z0_est];
+
+  augmentedDynamics = @(t, z_aug) [
+      A * z_aug(1:5) + B * (-K * z_aug(6:10)) + ...  
+      B_ambient * (x_a(t) - 20) + ...              
+      D_disturbance * d_func(t) * ones(5,1);       
+      
+      A * z_aug(6:10) + B * (-K * z_aug(6:10)) + ... 
+      L * (C * z_aug(1:5) - C * z_aug(6:10))         
+  ];
+
+  [t_sim, z_aug] = ode45(@(t,z) augmentedDynamics(t, z), t, z0_aug);
+
+  z_true = z_aug(:, 1:5)';
+  z_est = z_aug(:, 6:10)';
+
+  x_true = z_true + x_bar;
+  x_est = z_est + x_bar;
+
+  u_sim = zeros(length(t_sim), nControls);
+  for i = 1:length(t_sim)
+      u_sim(i,:) = (-K * z_est(:,i))';
+  end
+
+
+  t_hours = t_sim / 3600;
+
+  figure('Position', [100, 100, 1400, 1000]);
+
+  subplot(3, 2, 1);
+  d_values = arrayfun(d_func, t_sim);
+  x_a_values = arrayfun(x_a, t_sim);
+  plot(t_hours, d_values, 'r-', 'LineWidth', 2); hold on;
+  plot(t_hours, x_a_values, 'b-', 'LineWidth', 2);
+  ylabel('Power (W) / Temp (°C)');
+  title('External Influences');
+  legend('Disturbance d(t) [W]', 'Ambient Temp x_a(t) [°C]', 'Location', 'best');
+  grid on;
+
+  subplot(3, 2, 2);
+  plot(t_hours, x_true', 'LineWidth', 2); hold on;
+  plot(t_hours, x_est', '--', 'LineWidth', 1);
+  yline(20, '--k', 'Setpoint 20°C', 'LineWidth', 1);
+  ylabel('Temperature (°C)');
+  title('True (solid) vs Estimated (dashed) Temperatures');
+  legend('Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Location', 'best');
+  grid on;
+
+  subplot(3, 2, 3);
+  plot(t_hours, u_sim, 'LineWidth', 2);
+  ylabel('Heating Power (W)');
+  title('Control Inputs');
+  legend('Room 1 Heater', 'Room 2 Heater', 'Room 4 Heater', 'Location', 'best');
+  grid on;
+
+  subplot(3, 2, 4);
+  est_errors = x_true' - x_est';
+  plot(t_hours, est_errors, 'LineWidth', 1.5);
+  ylabel('Estimation Error (°C)');
+  title('Observer Performance: True - Estimated');
+  legend('Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Location', 'best');
+  grid on;
+
+  subplot(3, 2, 5);
+  total_power = sum(u_sim, 2);
+  plot(t_hours, total_power, 'k-', 'LineWidth', 2);
+  ylabel('Total Power (W)');
+  xlabel('Time (hours)');
+  title('Total Control Effort');
+  grid on;
+
+  subplot(3, 2, 6);
+  tracking_errors = x_true' - x_bar';
+  plot(t_hours, tracking_errors, 'LineWidth', 1.5);
+  ylabel('Tracking Error (°C)');
+  xlabel('Time (hours)');
+  title('True System Tracking Performance');
+  legend('Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Location', 'best');
+  grid on;
+
+\end{lstlisting}
+
+\subsection{Matlab code for exc 6}
+
+\begin{lstlisting}[style=matlabstyle]
+  clear all; close all; clc;
+
+  A = [9.9985 * 10^-1, 9.8510 * 10^-3;
+      -2.9553 * 10^-2, 9.7030 * 10^-1];
+  B = [4.9502 * 10^-5;
+      9.8510 * 10^-3];
+
+  H = [1, 0];
+
+  Q = 1;
+  R = 0.01;
+  N = 1001;
+  dt = 0.01;
+  time = (0:N-1)' * dt;
+
+  x0_true = [1; 1];
+
+  rng(42)
+  w = sqrt(Q) * randn(N,1);
+  v = sqrt(R) * randn(N,1);
+  x_true = zeros(2, N);
+  x_true(:,1) = x0_true;
+
+  for k = 1:N-1
+      x_true(:,k+1) = A * x_true(:,k) + B * w(k);
+  end
+
+  y_meas = H * x_true + v';
+  function [x_hat_plus, P_plus, x_hat_minus, P_minus] = ...
+      runKalmanFilter(A, B, H, Q, R, y_meas, x_hat0_minus, P0_minus, N)
+      x_hat_minus = zeros(2, N);
+      x_hat_plus = zeros(2, N);
+      P_minus = zeros(2,2,N);
+      P_plus = zeros(2,2,N);
+
+      x_hat_minus(:,1) = x_hat0_minus;
+      P_minus(:, :, 1) = P0_minus;
+      for k=1:N
+          Kk = P_minus(:, :, k) * H' / (H * P_minus(:, :, k) * H' + R);
+          x_hat_plus(:, k) = x_hat_minus(:, k) + Kk * (y_meas(k) - H * x_hat_minus(:, k));
+          P_plus(:, :, k) = (eye(2) - Kk * H) * P_minus(:, :, k);
+
+          if k < N
+              x_hat_minus(:, k+1) = A * x_hat_plus(:, k);
+              P_minus(:, :, k+1) = A * P_plus(:, :, k) * A' + B * Q * B';
+          end
+      end
+  end
+
+  [x_hat_plus_1, P_plus_1] = runKalmanFilter(A, B, H, Q, R, y_meas, [1.5; 0.5], [0.0001 0; 0 0.0001], N);
+  [x_hat_plus_2, P_plus_2] = runKalmanFilter(A, B, H, Q, R, y_meas, [50; -50], [100 0; 0 100], N);
+  [x_hat_plus_3, P_plus_3] = runKalmanFilter(A, B, H, Q, R, y_meas, [2; -1], [0.5 0.1; 0.1 0.5], N);
+  [x_hat_plus_4, P_plus_4] = runKalmanFilter(A, B, H, Q, R, y_meas, [1; 1], [0.001 0; 0 0.001], N);
+  [x_hat_plus_5, P_plus_5] = runKalmanFilter(A, B, H, Q, R, y_meas, [-20; 30], [2 1.5; 1.5 2], N);
+
+  error_1 = x_true - x_hat_plus_1;
+  error_2 = x_true - x_hat_plus_2;
+  error_3 = x_true - x_hat_plus_3;
+  error_4 = x_true - x_hat_plus_4;
+
+  dist1 = sqrt(sum(error_1.^2, 1));
+  dist2 = sqrt(sum(error_2.^2, 1));
+  dist3 = sqrt(sum(error_3.^2, 1));
+  dist4 = sqrt(sum(error_4.^2, 1));
+
+  figure;
+  plot(time, dist1, 'r-', 'LineWidth', 1.5); hold on;
+  plot(time, dist2, 'g-', 'LineWidth', 1.5);
+  plot(time, dist3, 'b-', 'LineWidth', 1.5);
+  plot(time, dist4, 'm-', 'LineWidth', 1.5);
+  xlabel('Time (s)');
+  ylabel('Euclidean Distance');
+  title('Distance Between True and Estimated State - Interesting Scenarios');
+  legend(...
+      'Case 1: Slightly Wrong + Overconfident', ...
+      'Case 2: Very Wrong + Very Uncertain', ...
+      'Case 3: Somewhat Wrong + Realistic', ...
+      'Case 4: Perfect + Overconfident', ...
+      'Location', 'best');
+  grid on;
+
+  figure('Position', [80, 80, 900, 1200]);
+
+  subplot(4,2,1);
+  sigma_bounds_1_state1 = 3 * squeeze(sqrt(P_plus_1(1,1,:)));
+  plot(time, error_1(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 1: State 1 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,2);
+  sigma_bounds_1_state2 = 3 * squeeze(sqrt(P_plus_1(2,2,:)));
+  plot(time, error_1(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 1: State 2 Error (x0=[1.5; 0.5], P=[0.0001 0; 0 0.0001])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,3);
+  sigma_bounds_2_state1 = 3 * squeeze(sqrt(P_plus_2(1,1,:)));
+  plot(time, error_2(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 2: State 1 Error (x0=[50; -50], P=[100 0; 0 100])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,4);
+  sigma_bounds_2_state2 = 3 * squeeze(sqrt(P_plus_2(2,2,:)));
+  plot(time, error_2(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 2: State 2 Error (x0=[50; -50], P=[100 0; 0 100])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,5);
+  sigma_bounds_3_state1 = 3 * squeeze(sqrt(P_plus_3(1,1,:)));
+  plot(time, error_3(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_1_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 3: State 1 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+
+  subplot(4,2,6);
+  sigma_bounds_3_state2 = 3 * squeeze(sqrt(P_plus_3(2,2,:)));
+  plot(time, error_3(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_3_state2, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 3: State 2 Error (x0=[2; -1], P=[0.5 0.1; 0.1 0.5])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,7);
+  sigma_bounds_4_state1 = 3 * squeeze(sqrt(P_plus_4(1,1,:)));
+  plot(time, error_4(1,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_4_state1, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 4: State 1 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  subplot(4,2,8);
+  sigma_bounds_4_state2 = 3 * squeeze(sqrt(P_plus_4(2,2,:)));
+  plot(time, error_4(2,:), 'b', 'LineWidth', 1.5); hold on;
+  plot(time, sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
+  plot(time, -sigma_bounds_4_state2, 'r--', 'LineWidth', 1);
+  ylabel('Error');
+  title('Case 4: State 2 Error (x0=[1; 1], P=[0.001 0; 0 0.001])');
+  legend('Error', '3σ Bound', 'Location', 'best');
+  grid on;
+
+  
+\end{lstlisting}
+
 
 \end{questions}
 \end{document}
