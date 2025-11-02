@@ -1,0 +1,230 @@
+\documentclass[12pt,A4, onecolumn]{exam}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[lmargin=71pt, tmargin=1.2in]{geometry}  %For centering solution box
+\lhead{TEK4090 -- Introduction to Modern Control\\}
+\rhead{Assignment 3\\}
+% \chead{\hline} % Un-comment to draw line below header
+\thispagestyle{empty}   %For removing header/footer from page 1
+
+\usepackage{graphicx}
+\graphicspath{{./figures/}}
+
+\def\showsoln{1}
+
+\begin{document}
+
+\begingroup  
+    \centering
+    \LARGE TEK4090 -- Introduction to Modern Control\\
+    \LARGE Assignment 2 v1.0\\[0.5em]
+    \large Due: November 17 2025, 23:30\\
+\endgroup
+\rule{\textwidth}{0.4pt}
+%\pointsdroppedatright   %Self-explanatory
+%\printanswers
+
+
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}   %Replace "Ans:" with starting keyword in solution box
+
+\begin{questions}
+
+ \question[40] Consider the following model of two masses connected by a flexible structure, with a lateral force on one of the masses.
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{./ffwd/flex}
+\end{center}
+A dynamical system can be written as,
+\begin{align}
+  \left( M_{lump} + M_{rod} \right)
+  \ddot U + 
+  C_{rod} \dot U +
+  K_{rod} U
+  = 
+  \begin{bmatrix}
+    1 \\ 0
+  \end{bmatrix}F,
+\end{align}
+where $U = \left[ x_1,x_2 \right]^T\in \mathbb{R}^2$ is the displacement of the two masses.
+Given the density $\rho_r$ of the rod, the elastic modulus $E_r$ of the rod, the cross-sectional area $A_r$ of the rod, the length $L_r$ of the rod, and the masses $M_1$ and $M_2$, the system matrices can be written as,
+\begin{align}
+  M_{lump} &= 
+  \begin{bmatrix}
+    M_1 & 0 \\ 0 & M_1
+  \end{bmatrix},~
+  M_{rod} = 
+  \dfrac{A_rL_r\rho_r}{6}
+  \begin{bmatrix}
+    2 & 1 \\ 1 & 2
+  \end{bmatrix}\\
+  C_{rod} &= \alpha K_{rod},~
+  K_{rod} = 
+  \dfrac{A_rE_r}{L_r}
+  \begin{bmatrix}
+    1 & -1 \\ -1 & 1
+  \end{bmatrix}.
+\end{align}
+For simplicity, let
+\begin{align}
+  \dfrac{A_rL_r\rho_r}{6} = 1;~ \dfrac{A_rE_r}{L_r} = 1;~M_1=M_2=10;~\alpha = 0.1.
+\end{align}
+Finally, let the input be $F$ and the output be $x_2$.
+\begin{parts}
+  \part Obtain the state space model $\Sigma:= (A,B,C,D)$ of the system.
+    Use Matlab to find the poles and zeros of the system.
+  \part Use Matlab to find the transfer function of the system, and verify the locations of the poles and zeros
+  \part The desired output acceleration of the system is $\ddot y = A\sin(\omega t)$. Choose $A$ such that the output reaches 1 after one period $T=10s$, and set it so that the acceleration reaches zero after $T$. Finally, obtain and plot the desired velocity and position as a function of time from $t_0=0$ to $t_f=T$.
+  \part Choose your favourite feedback system to track the desired reference output (for example, LQR) and explain your design decisions.
+  \part Simulate and plot the output tracking of the system with this feedback (for example, using LSIM in Matlab). What happens to the tracking performance if $T$ is varied?
+  \part Find the internal dynamics of the system, then find the reference state trajectory $x_{ref}$ and the inverse input $u_{inv}$.
+    Plot them, and describe how you found them.
+  \part Simulate and plot the system with this feedforward input.
+  \part Add the feedforward and feedback inputs together, and simulate the results in Matlab. Which setup has the best tracking performance (i.e., feedback, feedforward, feedback + feedforward)?
+  \part Using the feedback + feedforward controller in the previous part, modify the system slightly before simulation (for example, modify $M_1$ and $M_2$ by $\pm 1\%$) in order to simulate uncertainty in the model parameters. Which setup has the best tracking performance (i.e., feedback, feedforward, feedback + feedforward)?
+\end{parts}
+
+\question[20] 
+Estimate the resistance value starting from a series of repeated current and voltage measurements.
+Assume the true relationship
+\[
+u_0(t) = R_0\, i_0(t), \qquad t=1,2,\ldots,N,
+\]
+where $u_0,i_0$ are the exact (noise–free) voltage and current.
+
+Two different voltmeters are used, producing two data sets: one with low noise and one with high noise.
+
+\begin{itemize}
+  \item \textbf{Data generation.} Generate an experiment with $N$ measurements where
+  $i_0$ is uniformly distributed in $[-0.01,\,0.01]~\mathrm{A}$ and $R_0=1250~\Omega$.
+  The current is measured without errors, while the voltage measured by the two voltmeters is disturbed by independent, zero-mean, normally distributed noise $n_u$:
+  \[
+  n_u \sim \mathcal{N}(0,\sigma_u^2), \qquad
+  \sigma_u^2 =
+  \begin{cases}
+  1,  & \text{(good voltmeter)},\\
+  16, & \text{(bad voltmeter)}.
+  \end{cases}
+  \]
+  Thus, with the measured signals
+  \[
+  i(t)=i_0(t), \qquad
+  u(t)=u_0(t)+n_u(t), \qquad t=1,2,\ldots,2N,
+  \]
+  the first $N$ samples come from the good voltmeter and the next $N$ from the bad one.
+\end{itemize}
+\begin{parts}
+  \part[5] \textbf{Weighted least-squares (WLS).} Derive the WLS estimate $\hat R$ of $R$ by minimizing
+  \[
+  V_{\mathrm{WLS}} = \frac{1}{2N}\sum_{t=1}^{2N} \frac{\big(u(t)-R\,i(t)\big)^2}{w(t)},
+  \]
+  where $w(t)$ is the variance of the voltage noise corresponding to sample $t$.
+  Also, derive the \textbf{unweighted} least squares estimator, which minimizes,
+  \begin{align}
+    V_{\mathrm{LS}} =  \frac{1}{2N}\sum_{t=1}^{2N} {\big(u(t)-R\,i(t)\big)^2}
+  \end{align}
+  \part[5] Set $N=100$. Compute an estimate $\hat{R}$ $10^5$ times, using different data each time (according to the Data Generation procedure above), for both the LS and WLS procedures.
+    Plot the resulting values of $\hat R$ in two histograms with an appropriate number of bins, one histogram for WLS and one for LS.
+    Discuss the results.
+  \part[10] Derive expressions for the variance of the WLS and the LS estimators. Compute the values of each based on the model parameters listed in the Data Generation procedure. Then, compute the sample variance of the estimates $\hat R$ in your experiments in part (a). Compare these to the expressions that you derived/computed. What would happen as the number of experiments increases from $10^5$?
+\end{parts}
+
+\question[20] \textbf{Least-Squares Identification of a One-Parameter Linear System.}
+Consider the discrete-time system
+\[
+y_k = a\,y_{k-1} + b\,u_{k-1} + e_k, \qquad k = 2, \ldots, N,
+\]
+where
+\begin{itemize}
+  \item \(y_k\) is the measured output,
+  \item \(u_k\) is the known input,
+  \item \(e_k\) is a zero-mean white noise sequence,
+  \item \(a,b\) are unknown parameters to be estimated.
+\end{itemize}
+Stack all samples \(k=2,\ldots,N\) to obtain
+\[
+\mathbf{y} = \Phi\,\theta + \mathbf{e},
+\]
+with
+\begin{align}
+\Phi =
+\begin{bmatrix}
+y_1 & u_1\\
+y_2 & u_2\\
+\vdots & \vdots\\
+y_{N-1} & u_{N-1}
+\end{bmatrix},
+\qquad
+\theta =
+\begin{bmatrix}
+a\\
+b
+\end{bmatrix},
+\qquad
+\mathbf{y} =
+\begin{bmatrix}
+y_2\\
+y_3\\
+\vdots\\
+y_N
+\end{bmatrix},
+\qquad
+\mathbf{e} =
+\begin{bmatrix}
+e_2\\
+e_3\\
+\vdots\\
+e_N
+\end{bmatrix}.
+\label{eq:model}
+\end{align}
+
+\begin{parts}
+\part[5]
+By minimizing the sum of squared residuals
+\[
+V(a,b) = \sum_{k=2}^N \big(y_k - a\,y_{k-1} - b\,u_{k-1}\big)^2,
+\]
+show that the optimal parameters satisfy the \emph{normal equations}
+\[
+\Phi^\top \Phi\,\hat{\theta} = \Phi^\top \mathbf{y},
+\]
+leading to the closed-form least-squares solution
+\begin{align}
+  \boxed{\hat{\theta} = (\Phi^\top \Phi)^{-1}\Phi^\top \mathbf{y}.}\label{eq:ls}
+\end{align}
+\part[10] Set $N=100$, $a=0.2$ and $b=-0.25$, and $e_k\sim \mathcal{N}(0,0.5)$, and consider the following input sequences:
+\begin{itemize}
+  \item a random input that is 1 half the time, and -1 half the time: 
+    \begin{align}
+      u_k \sim 
+    \begin{cases}
+      1 & {p=0.5}\\
+      -1 & {p=-0.5}
+    \end{cases}
+    \end{align}
+  \item a random uniform input:
+    \begin{align}
+      u_k \sim \textbf{randu[-1,1]}
+    \end{align}
+  \item a gaussian input with mean zero and variance 1:
+    \begin{align}
+      u_k \sim \mathcal{N}(0,1)
+    \end{align}
+\end{itemize}
+
+For each input type, perform the following:
+\begin{itemize}
+  \item Generate $\mathbf{y}$ using Equation~\eqref{eq:model}
+  \item Generate $\hat\theta$ using Equation~\eqref{eq:ls}
+  \item Repeat this process $10^5$ times
+\end{itemize}
+Plot histograms for $\hat{a}$ and for $\hat{b}$ for the different input types on the same plot. Which input type yields the lowest variance estimate?
+
+\part[5] Discussion
+\begin{enumerate}
+  \item Under what conditions is \(\Phi^\top\Phi\) invertible?
+  \item What happens if the input \(u_k\) is constant?
+  \item How would correlated noise \(e_k\) affect the bias of the estimates?
+\end{enumerate}
+\end{parts}
+\end{questions}
+\end{document}
