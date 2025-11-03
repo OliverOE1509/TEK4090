@@ -1,7 +1,9 @@
-\documentclass[12pt,A4, onecolumn]{exam}
+\documentclass[12pt,a4paper, onecolumn]{exam}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage[lmargin=71pt, tmargin=1.2in]{geometry}  %For centering solution box
+\usepackage{epstopdf}
+\usepackage{changepage}  % Add this line with your other packages
+\usepackage[lmargin=71pt, tmargin=1.2in]{geometry} %For centering solution box
 \lhead{TEK4090 -- Introduction to Modern Control\\}
 \rhead{Assignment 3\\}
 % \chead{\hline} % Un-comment to draw line below header
@@ -11,6 +13,7 @@
 \graphicspath{{./figures/}}
 
 \def\showsoln{1}
+\printanswers
 
 \begin{document}
 
@@ -26,12 +29,17 @@
 
 
 \renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}   %Replace "Ans:" with starting keyword in solution box
+\renewenvironment{solution}
+  {\begin{adjustwidth}{-2cm}{-2cm}% Reduce left and right margins by 2cm each
+   \par\noindent\solutiontitle\ignorespaces}
+  {\end{adjustwidth}}
+
 
 \begin{questions}
 
  \question[40] Consider the following model of two masses connected by a flexible structure, with a lateral force on one of the masses.
 \begin{center}
-  \includegraphics[width=0.5\linewidth]{./ffwd/flex}
+  \includegraphics[width=0.5\linewidth]{./figures/flexStructure.png}
 \end{center}
 A dynamical system can be written as,
 \begin{align}
@@ -121,10 +129,66 @@ Two different voltmeters are used, producing two data sets: one with low noise a
   \begin{align}
     V_{\mathrm{LS}} =  \frac{1}{2N}\sum_{t=1}^{2N} {\big(u(t)-R\,i(t)\big)^2}
   \end{align}
+
+  \begin{solution}
+    To find the optimal $ \hat{R}_{WLE} $, we differentiate with respect to R and set the expression equal to 0, to find the given R.
+    
+    \begin{align*}
+      \frac{ \partial V_{WLS} }{ \partial R } &= 2 \cdot \frac{ 1 }{ 2N } \sum_{ t=1 }^{ 2N } \frac{ i \left( u - Ri \right)  }{ w } \\
+      &= \frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } \frac{ i u  }{ w } - R\frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } \frac{ i^2  }{ w } \\
+      \frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } \frac{ i u  }{ w } &= R\frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } \frac{ i^2 }{ w} \\
+      \hat{R}_{WLS} &= \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t)u(t) }{ w(t) } }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } }
+    \end{align*}
+
+    And for the LS method, without the weights added, we get
+
+    \begin{align*}
+      \frac{ \partial V_{LS} }{ \partial R } &= 2 \cdot \frac{ 1 }{ 2N } \sum_{ t=1 }^{ 2N } i \left( u - Ri \right) \\
+      &= \frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } iu - R \frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } i^2  \\
+      \frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } iu &= R \frac{ 1 }{ N } \sum_{ t=1 }^{ 2N } i^2 \\
+      \hat{R}_{LS} &= \frac{ \sum_{ t=1 }^{ 2N } iu }{ \sum_{ t=1 }^{ 2N } i^2 }
+    \end{align*}
+    
+    And the question should be answered
+    
+  \end{solution}
+
   \part[5] Set $N=100$. Compute an estimate $\hat{R}$ $10^5$ times, using different data each time (according to the Data Generation procedure above), for both the LS and WLS procedures.
     Plot the resulting values of $\hat R$ in two histograms with an appropriate number of bins, one histogram for WLS and one for LS.
     Discuss the results.
+
+    \begin{solution}
+      There should be no surprise that the WLS estimates of the Ohms provide the most accurate ones. This happens because we have two voltimeters, and we give the voltimeter we trust the most, the most weight. This weight is given as the variance of the voltage noise ordered by the voltimeters. 
+
+      \begin{center}
+        \includegraphics[width=1\linewidth]{Figure_6.pdf}
+      \end{center}
+
+      The estimation of $ \hat{R } $ over all the $ 10^5 $ experiments, leads to the figure above, which looks normally distributed, and indeed it obviously is, from the errors from the 2 voltimeters that are normally distributed
+
+      \begin{center}
+        \includegraphics[width=0.8\linewidth]{normality_WLS.pdf}
+      \end{center}
+      \begin{center}
+        \includegraphics[width=0.8\linewidth]{normality_LS.pdf}
+      \end{center}
+      
+
+      Basically, if the two arrays for the estimates, are closer to the straigt line with slope $ \frac{ 1 }{ 1320-1180 } = \frac{ 1 }{ 140 } $, the more normal it is distributed. The plots above confirms our belief.
+    \end{solution}
+
+
+
   \part[10] Derive expressions for the variance of the WLS and the LS estimators. Compute the values of each based on the model parameters listed in the Data Generation procedure. Then, compute the sample variance of the estimates $\hat R$ in your experiments in part (a). Compare these to the expressions that you derived/computed. What would happen as the number of experiments increases from $10^5$?
+
+  \begin{solution}
+    To derive the variance of the estimators, we take the $ \hat{R}_{LS} $ and $ \hat{R}_{WLS} $ and set them as inputs to the function $ V(x) $
+    
+    \begin{align*}
+      V(\hat{R}_{WLS}) &= 
+    \end{align*}
+    
+  \end{solution}
 \end{parts}
 
 \question[20] \textbf{Least-Squares Identification of a One-Parameter Linear System.}

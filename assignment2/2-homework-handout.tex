@@ -853,7 +853,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
  \question[10] \textit{Crassidis \& Junkins} Problem 7.4
 \begin{solution}
 
-  Quick note, Im just ramsing up the important math at the beginning. You can skip to where I say 'Furhtermore' for direct results from simulation. Instead of using euler angles, a nice representation of attitude is using quaternions. 
+  Quick note, Im just rambling up the important math at the beginning. You can skip to where I say 'Furthermore' for direct results from simulation. Instead of using euler angles, a nice representation of attitude is using quaternions. 
 
   \[
       \vec{q} = \left[ q_1, q_2, q_3, q_4 \right] = \left[ \epsilon, q_4 \right]  
@@ -869,35 +869,71 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
   \[
       \frac{ d\beta }{ dt } = \eta_u \tag{bias drift noise} 
   \]
-  where beta is the gyro bias vector. 
+
+  \begin{itemize}
+    \item $ \vec{\beta}$ is the gyro bias vector
+    \item $ \vec{\eta}_v $ is the gyro measurement noise 
+    \item $ \vec{\eta}_u $ is the bias drift noise   
+  \end{itemize}
+   
   
 
-  For the error state formulation, we use the direct error to maintain the quaternion normalization constraint, $ \delta \vec{q} = \vec{q} \otimes \hat{\vec{q}}^{-1} $
+  For the error state formulation, we use the direct error to maintain the quaternion normalization constraint. The attitude error is defined as $ \delta \vec{q} = \vec{q} \otimes \hat{\vec{q}}^{-1} $
   
   
-  The error state dynamics are given as linearized error dynamics, 
+  For small errors, it can be linearized using the approximated error quaternion as 
+
+  \[
+      \delta \vec{q} \approx \begin{bmatrix}
+          \frac{ 1 }{ 2 } \delta \vec{\alpha} \\ 1
+      \end{bmatrix} 
+  \]
+  where $ \delta \vec{\alpha} $ is a $ 3\times 1$ error angle vector.
+  
+  the linearized error dynamics are
   \begin{itemize}
-    \item $ \frac{ d \delta \alpha }{ dt } = - \left[ \omega \times \right] \delta \alpha - \Delta \beta  - \eta_v $ 
-    \item $ \frac{ d \Delta \beta }{ dt } = \eta_u $ 
+    \item $ \frac{ d \delta \vec{\alpha_{}^{} } }{ dt } = - \left[ \vec{\omega} \times \right] \delta \vec{\alpha_{}^{} } - \Delta \vec{\beta} - \vec{\eta}_v $
+    \item $ \frac{ d \Delta \vec{\beta} }{ dt } = \vec{\eta}_u $ 
+  \end{itemize}
+  where \begin{itemize}
+    \item $ \delta \vec{\alpha} $ is the attitude error vector
+    \item $ \Delta \vec{\beta} $ is the gyro bias vector 
+    \item $ \left[ \vec{\omega}  \times \right]  $ is the skew symmetric matrix  
   \end{itemize}
 
-  where $ \left[  \omega \times \right]  $ is the skew symmetric matrix given by $ \begin{bmatrix}
-      0 & -\omega_3 & \omega_2 \\
-      \omega_3 & 0 & - \omega_1 \\
-      -\omega_2 & \omega_1 & 0
-  \end{bmatrix}  $  
 
+  For the extended kalman filter implementation, we have the state vector $ \vec{x} = \left[ \vec{q}, \beta \right] $. Then, for each time step, the quaternion is propagated (predicted) using angle-axis rotation.
 
-  And now for the extended kalman filter implementation, we start by defining the state vector $ \vec{x} = \left[ \vec{q}, \vec{\beta} \right]  $. For each step in our discretized timeline, we propagate the new quaternion as 
   \[
-      \hat{q}_{k+1}^- =  \frac{ 1 }{ 2 } \Omega(\hat{\omega}_k \Delta t) \hat{q}_k^+
+      \vec{q}_{k+1}^- = \hat{q}_k^+ \otimes \vec{q}(\hat{ \vec{\omega}}_k \Delta t)
   \]
-  where the exponential is computed as 
-  $$ exp \left( \frac{ 1 }{ 2 } \Omega (\omega) \delta t \right) = \begin{bmatrix}
-      cos \left(  1/2 \norm{\omega}_{}^{} \Delta t \right) I - \left[ \phi \times \right] & \psi \\
-      -\psi^T  & cos \left( 1/2 \norm{\omega}_{}^{} \Delta t \right)  
-  \end{bmatrix}   $$
-  with $ \psi = sin \left( 1/2 \norm{\omega}_{}^{} \Delta t \right) * \frac{ \omega }{ \norm{\omega}_{}^{}  }  $ 
+  where the incremental rotation quaternion is 
+  \[
+      \vec{q}(\hat{ \vec{\omega}}_k \Delta t) = \begin{bmatrix}
+          \sin \left( \frac{ \lvert \hat{\omega}_k \rvert \Delta t }{ 2 } \right) \frac{ \hat{ \vec{\omega}}_k }{ \lvert \hat{ \vec{\omega}}_k \rvert } \\
+          \cos \left( \frac{  \lvert \hat{ \vec{\omega}}_k \rvert \Delta t }{ 2 } \right) 
+      \end{bmatrix} 
+  \]
+  This is equivalent to the matrix implemented in the code:
+
+  \[
+      \hat{ q}_{k+1}^- = \Omega \left( \hat{ \vec{\omega}}_k \Delta t \right) \hat{q}_k^+ 
+  \]
+  Where $ \Omega \left( \vec{\omega} \right)  $ is made from the axis angle parameters, which are $ \vec{q} = \begin{bmatrix}
+      \vec{u} \sin \left( \frac{ \theta }{ 2 } \right) \\
+      \cos \left(  \frac{ \theta }{ 2 } \right)  
+  \end{bmatrix}  $ where $ \theta = \norm{\omega}_{}^{}  \Delta t$ 
+  
+  Its formulated explicitly like this
+  \begin{verbatim}
+  psi = sin(0.5 * omega_norm * dt) * omega_est / omega_norm;
+  cos_term = cos(0.5 * omega_norm * dt);
+  Omega = [cos_term * eye(3) - skew_symmetric(psi), psi;
+          -psi', cos_term];
+  q_est(:,k+1) = Omega * q_est(:,k);
+  \end{verbatim}
+  
+  
 
 
   For simplification, I used a diagonal process noise covariance matrix. $$ Q = \begin{bmatrix}
@@ -1825,7 +1861,7 @@ Now we just also use the fact that $ J_0^* = min_u J_0(u) $  and get that
       bias_error_norms = sqrt(sum(bias_errors.^2, 1));
       plot(time_minutes, bias_error_norms, colors{idx}, 'LineWidth', 2, 'DisplayName', scenario_names{idx});
   end
-  ylabel('Bias error borm (deg/hr)');
+  ylabel('Bias error norm (deg/hr)');
   xlabel('Time (min)');
   title('Norms: actual vs estimated gyro bias');
   legend('show');
