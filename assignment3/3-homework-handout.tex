@@ -185,8 +185,36 @@ Two different voltmeters are used, producing two data sets: one with low noise a
     To derive the variance of the estimators, we take the $ \hat{R}_{LS} $ and $ \hat{R}_{WLS} $ and set them as inputs to the function $ V(x) $
     
     \begin{align*}
-      V(\hat{R}_{WLS}) &= 
+      V(\hat{R}_{WLS}) &= V \left( \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t) u(t) }{ w(t) } }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } } \right) \\
+      &=V \left( \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t) \left( R_0i_0(t) + n_u(t) \right)  }{ w(t) } }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } } \right) \\
+      &= V \left( \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t)R_0i_0(t) }{ w(t) } }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2  }{ w(t) } } + \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t) n_u(t) }{ w(t) } }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } } \right) 
     \end{align*}
+
+    
+    Since $ i(t) = i_0(t) $ is the \textbf{\textit{true}} current, we can substitute that into the first fraction and get 
+
+    \begin{align*}
+      V(\hat{R}_{WLS} &= V(R_0) + \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 V(n_u(t) }{ w(t)^2 } }{ \left( \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } \right)^2  }
+    \end{align*}
+    And since $ V(n_u(t)) = w(t) $, we get
+    
+    \begin{align*}
+      V(\hat{R}_{WLS}) &= \frac{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^4 }{ w(t)^2 } }\\
+      &= \frac{ 1 }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } }
+    \end{align*}
+    
+    Which is the final expression. Its important to note that for a linear equation $ a+bx $, then $ V(a+bx) = b^2V(x) $ where x is a random variable, which is why the $ R_0 $ term disappears
+    
+    Now for the derivation of $ \hat{R}_{LS} $ 
+
+    \begin{align*}
+      V(\hat{R}_{LS}) &=  V \left( \frac{ \sum_{ t=1 }^{ 2N } i(t)u(t) }{ \sum_{ t=1 }^{ 2N } i(t)^2 } \right) \\
+      &= V \left( \sum_{ t=1 }^{ 2N } \frac{ i(t) \left( R_0i_0(t) + n_u(t) \right)  }{ i(t)^2 } \right)  \\
+      &= V \left( \sum_{ t=1 }^{ 2N } \frac{ i(t) R_0 + i(t)^2 n_u(t) }{ i(t)^2 } \right) \\
+      &= V(R_0) + \sum_{ t=1 }^{ 2N } \frac{ i(t)^2V(n_u(t) }{ i(t)^4 } \\
+      &= \frac{ 1 }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } }
+    \end{align*}
+    from the same reasoning that $ V(n_u(t)= w(t) $ 
     
   \end{solution}
 \end{parts}
