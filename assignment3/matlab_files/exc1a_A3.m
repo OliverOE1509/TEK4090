@@ -19,6 +19,9 @@ B = [0;0;12;-1];
 C = [0 1 0 0];
 D = 0;
 
+O = obsv(A, C);
+
+
 sys = ss(A, B, C, D);
 poles = eig(A);
 zeros = tzero(sys);

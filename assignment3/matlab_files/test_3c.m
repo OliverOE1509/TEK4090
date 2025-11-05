@@ -2,7 +2,9 @@ N = 100;
 a = 0.2;
 b = -0.25;
 eps = normrnd(0, 0.5, N, 1);
+disp(ones(4,1))
 
+return
 function [y_, Phi] = generate_y(N, a, b, which_u)
     switch which_u
         case 1
