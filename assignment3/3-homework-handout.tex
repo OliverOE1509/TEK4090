@@ -283,6 +283,33 @@ leading to the closed-form least-squares solution
 \begin{align}
   \boxed{\hat{\theta} = (\Phi^\top \Phi)^{-1}\Phi^\top \mathbf{y}.}\label{eq:ls}
 \end{align}
+
+\begin{solution}
+  To derive the optimal parameters that satisfy the normal equations, we see first that from the exercise, we are given that we have dropped the error terms in the sum. And when we stack all the $ y_k, u_k, $ and all a, b that shall be  estimated, we get the sum thats given in the exercise. In quadratic form, this turns to
+
+  \begin{align*}
+    r &= y - \Phi \theta\\ 
+    V(\theta) &= r^Tr\\ 
+    &= \left( y - \Phi \theta \right) ^T \left( y - \Phi \theta \right) \\
+    &= y^Ty - y^T \Phi \theta - \left( \Phi \theta \right)^T y + \left( \Phi \theta \right)^T \left( \Phi \theta \right) \\
+    &= y^Ty - 2 \theta^T \Phi ^T y + \theta^T \Phi^T \Phi \theta
+  \end{align*}
+  
+
+
+  
+  And now we have to find the optimal parameters a, b that find the minimized sum of squared residuals
+
+  \begin{align*}
+    \frac{ \partial V(\theta) }{ \partial \theta } &= 0 - 2 \Phi ^T y + 2 \Phi^T \Phi \theta =0\\
+    2\left( \Phi ^T \Phi \right)\hat{\theta} &=  2\Phi^T y \\
+    \hat{\theta} &= \left( \Phi ^T \Phi \right) ^{-1} \Phi^T y
+  \end{align*}
+  This assumes of course that $ \Phi^T \Phi $ is invertible. I will get to this more in 3 c). But all in all, I think the exercise is solved.
+  
+
+\end{solution}
+
 \part[10] Set $N=100$, $a=0.2$ and $b=-0.25$, and $e_k\sim \mathcal{N}(0,0.5)$, and consider the following input sequences:
 \begin{itemize}
   \item a random input that is 1 half the time, and -1 half the time: 
@@ -311,12 +338,79 @@ For each input type, perform the following:
 \end{itemize}
 Plot histograms for $\hat{a}$ and for $\hat{b}$ for the different input types on the same plot. Which input type yields the lowest variance estimate?
 
+\begin{solution}
+  Here is the histogram plots for the different a and b:
+
+  \begin{center}
+    \includegraphics[width = 1\linewidth]{./figures/figure_exc_3b_A3.pdf}
+  \end{center}
+
+  I will refer to the different control series generation processes like the following:
+
+  \begin{itemize}
+  \item \textbf{\textit{Method 1}}: a random input that is 1 half the time, and -1 half the time: 
+    \begin{align}
+      u_k \sim 
+    \begin{cases}
+      1 & {p=0.5}\\
+      -1 & {p=-0.5}
+    \end{cases}
+    \end{align}
+  \item \textbf{\textit{Method 2}}: a random uniform input:
+    \begin{align}
+      u_k \sim \textbf{randu[-1,1]}
+    \end{align}
+  \item \textbf{\textit{Method 3}}: a gaussian input with mean zero and variance 1:
+    \begin{align}
+      u_k \sim \mathcal{N}(0,1)
+    \end{align}
+\end{itemize}
+
+  I also gather that the empirical variance of the $ \hat{a} $ and $ \hat{b} $ arrays vary between the method 1 and method 3. The following table displays the variance of said arrays, where column i is either the $ \hat{a} $ array or the $ \hat{b} $ array, and the column i is $ method_i $ 
+
+  \begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\hline
+Input Type & Var(\^{a}) & Var(\^{b}) \\
+\hline
+Method 1 & 0.007833 & 0.002547 \\
+Method 2 & 0.009062 & 0.007751 \\
+Method 3 & 0.007848 & 0.002587 \\
+\hline
+\end{tabular}
+\end{table}
+
+From this, we see that method 2 is without a doubt the worst. It is relatively close between method 1 and method 2 having the lowest variance implication on the coefficient estimates $ \hat{a} $ and $ \hat{b} $.
+
+It comes to the point where it differs between each time I run the code. 
+
+\end{solution}
+
 \part[5] Discussion
 \begin{enumerate}
   \item Under what conditions is \(\Phi^\top\Phi\) invertible?
+  \begin{solution}
+      $ \Phi^T \Phi $ is invertible if and only if the following is satisfied; The columns of $ \Phi^T \Phi $ have full rank. The only case where this would not happen, was if the controls $ u_k = 0 \forall k$. This is unlikely in practice 
+    \end{solution} 
   \item What happens if the input \(u_k\) is constant?
+  \begin{solution}
+      If one of the controls are constant, I dont see any much affection on the series y. But if $ u_k=0 \forall k $ then the matrix $ \Phi^T \Phi $ is non-invertible. I mentioned this earlier. In this case, the estimates $ \hat{a} $ and $ \hat{b} $ are all zero. This is because the equation
+
+      \[
+          \hat{\theta} = \left( \Phi^T \Phi \right) ^{-1} \Phi^T y
+      \]
+
+      would not exist, due non-invertible property of the $ \Phi^T \Phi $ matrix
+      
+  \end{solution}
   \item How would correlated noise \(e_k\) affect the bias of the estimates?
+  \begin{solution}
+    FDGDS
+  \end{solution}
 \end{enumerate}
+
+
 \end{parts}
 \end{questions}
 \end{document}
