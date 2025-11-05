@@ -1,0 +1,8 @@
+T = 10;
+w = 2 * pi / T;
+A = w / T;
+t = 0:0.01:T;
+
+yddot_des = A * sin(w * T);
+ydot_des = (A/w) * (1 - cos(w * t));
+y_des = -(A/w^2)

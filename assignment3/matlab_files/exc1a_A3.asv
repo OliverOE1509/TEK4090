@@ -24,10 +24,9 @@ poles = eig(A);
 zeros = tzero(sys);
 
 sys_tf = tf(sys);
-[num, den] = tfdata(sys_tf, 'v');
+[num, den] = tfdata(sys_tf);
+
 roots_den = roots(den);
-
 disp(roots_den)
-disp(poles)
-
+disp(pole)
 
