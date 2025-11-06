@@ -15,7 +15,7 @@ A = [0 0 1 0;
     0 0 0 1;
     -13/143 13/143 -1.3/143 1.3/143;
     13/143 -13/143 1.3/143 -1.3/143];
-B = [0;0;12;-1];
+B = [0;0;12/143;-1/143];
 C = [0 1 0 0];
 D = 0;
 
@@ -27,6 +27,8 @@ poles = eig(A);
 zeros = tzero(sys);
 
 sys_tf = tf(sys);
+
+disp(sys_tf)
 [num, den] = tfdata(sys_tf, 'v');
 roots_den = roots(den);
 
