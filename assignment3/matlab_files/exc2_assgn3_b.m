@@ -7,9 +7,7 @@ function R_hat = wls_estimate(i, u, w)
     %   w - weights (variances, vector)
     %
     % Output:
-    %   R_hat - estimated resistance
-    disp(size(w))
-    
+    %   R_hat - estimated resistance    
     % Calculate numerator: sum(i*u / w)
     numerator = sum((i .* u) ./ w);
     
@@ -70,16 +68,13 @@ num_experiments = 1e5;
 
 % Plot histograms
 
-disp(size(estimates_ls))
-disp(size(estimates_wls))
+
+disp(var(estimates_ls))
+return
+
 
 figure;
 
-
-normplot(estimates_wls)
-title('Normal probability plot for the WLS estimates')
-
-return
 h1 = histogram(estimates_wls, 'FaceAlpha', 0.5, 'DisplayName', 'WLS', BinMethod='scott');
 hold on;
 h2 = histogram(estimates_ls, 'FaceAlpha', 0.5, 'DisplayName', 'LS', BinMethod='scott');

@@ -4,6 +4,7 @@
 \usepackage{epstopdf}
 \usepackage{listings}
 \usepackage{changepage}  % Add this line with your other packages
+\usepackage{booktabs}
 \usepackage[lmargin=71pt, tmargin=1.2in]{geometry} %For centering solution box
 \lhead{TEK4090 -- Introduction to Modern Control\\}
 \rhead{Assignment 3\\}
@@ -411,7 +412,15 @@ Finally, let the input be $F$ and the output be $x_2$.
     \includegraphics[width = 1\linewidth]{exc_1d_A3.pdf}
   \end{center}
 
-  From this, we see that the initial position first decreases, and then starts to follow the desired trajectory with a delay. This is due to the non minimum phase property of our system. If we increase T, we see that the state doesnt converge to our desired trajectory
+  From this, we see that the initial position first decreases, and then starts to follow the desired trajectory with a delay. This is due to the non minimum phase property of our system. If we increase T, we see that the state doesnt converge to our desired trajectory.\\
+
+  As we vary T, we dont see any improvements. The tracking errors are linearly proportional to the time, and will only see an increase as time goes on.
+
+  \begin{center}
+    \includegraphics[width = 0.8\linewidth]{exc1e_A3.pdf}
+  \end{center}
+
+  The $ y_d $ trajectory continues to end at 1, because we just wary the angular velocity $ \omega $ 
 
   \end{solution}
   \part Find the internal dynamics of the system, then find the reference state trajectory $x_{ref}$ and the inverse input $u_{inv}$.
@@ -424,7 +433,7 @@ Finally, let the input be $F$ and the output be $x_2$.
       &= A_y x(t) + B_yu(t)
     \end{align*}
 
-    where r is the difference in degrees of our transfer functions numerator and denominator. From 1b), we can obviously see that $ r=2 $ in our case.\\
+    where r is the difference in degrees of our transfer functions numerator and denominator. From 1b), we can obviously see that $ r=2 $ in our case ( $ r= $  difference. in degree of numerator and denominator of the transfer function). \\
 
     We want to find a transformation matrix T such that 
     \[
@@ -469,32 +478,142 @@ Finally, let the input be $F$ and the output be $x_2$.
 
     The internal dynamics are given as 
     \[
-        \dot{\eta} = A_{inv} \eta + B_{inv} \Upsilon_d
+        \dot{\eta} = A_{inv} \eta + B_{inv} \mathcal{Y}_d
     \]
     where
 
     \begin{itemize}
       \item $ A_{inv} = T_{\eta} \left[ A - BB_y^{-1}A_y \right] T_r^{-1} $
       \item $ B_{inv} = \left[ T_{\eta} \left[ A - BB_y^{-1}A_y \right]T_l^{-1} : T_{\eta} BB_y^{-1} \right]  $  
-      \item $ \Upsilon_d = \begin{bmatrix}
+      \item $ \mathcal{Y}_d = \begin{bmatrix}
           \zeta_d& \ddot{y}_d
       \end{bmatrix}^T = \begin{bmatrix}
           y_d&\dot{y}_d& \ddot{y}_d
       \end{bmatrix}   $ 
     \end{itemize}
      
-    Since our system is non minimum phase, the $ 2 \times 2 $ matrix $ A_{inv} $ has a positive unstable eigenvalue. We need to decouple A. This allows us to solve for the stable part causally forward in time, and the unstable part backwards noncausal. We know that A is diagonalizable, we write $ A_{inv} = V D V^{-1} $
-    
+    Since our system is non minimum phase, the $ 2 \times 2 $ matrix $ A_{inv} $ has a positive unstable eigenvalue. We need to decouple A. This allows us to solve for the stable part causally forward in time, and the unstable part backwards noncausal. We know that A is diagonalizable, we write $ A_{inv} = V D V^{-1} $. So in this new decoupled system, we get the following internal dynamics
 
-    
-    
-    
+    \[
+        \frac{ d }{ dt } \begin{bmatrix}
+            \eta_s\\ \eta_l
+        \end{bmatrix}  = \begin{bmatrix}
+            A_s&0\\
+            0&A_l
+        \end{bmatrix} \begin{bmatrix}
+            \eta_s\\ \eta_l
+        \end{bmatrix} + \begin{bmatrix}
+            B_s\\ B_l
+        \end{bmatrix} \mathcal{Y} 
+    \]
+
+    where $ A_s $  is the part that contains the stable eigenvaues, and $ A_l $ contains the unstable parts.    
   \end{solution}
 
   \part Simulate and plot the system with this feedforward input.
+
+  \begin{solution}
+  \begin{center}
+    \includegraphics[width = 1 \linewidth]{exc1g_A3.pdf}
+  \end{center}
+
+  As you can see, we have a \textbf{\textit{big}} improvement from our feedforward controller. This can confirm that feedforward control largely improves performance of non-minimum phase systems, to the point where we have perfect control. We also start off with initial non-zero control effort, due to the anticipation. Amazing
+  \end{solution}
+
   \part Add the feedforward and feedback inputs together, and simulate the results in Matlab. Which setup has the best tracking performance (i.e., feedback, feedforward, feedback + feedforward)?
+
+  \begin{solution}
+
+    I measure the best model with the following metric
+
+  \begin{verbatim}
+    tracking_error = y_desired - y_simulated
+    error_metric = trapz(tracking_error)
+  \end{verbatim}
+  
+  I will show a table with the metrics measured after discussing the results.
+
+
+  First, I display the solution for the added control of the feedback and feedforward
+
+  \[
+      u_{total} = u_{fb} + u_{ff}
+  \]
+  This gives the following graph.
+
+  \begin{center}
+    \includegraphics[width = 0.8\linewidth]{exc1h_A3.pdf}
+  \end{center}
+  Very nice. Since I have already showed the plots with the controls gathered from feedback and feedforward from 1d) and 1f), I will just refer you back there. \\
+
+  We see that the worst performing controller, is the one purely using feedback. This is because it will only regulate itself as it goes. But since our system has non-minimum phase, we need to be able to predict future behaviour and adjust our controls according to the predictions we have. This allows us to anticate future behaviour of our system.\\
+
+  The table below has all the same environment assumption. All have the same time and the same desired output. The metrics take the integral of the difference between desired and actual trajectory. So the bigger the number, the more worse control
+
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{lcc}
+  \hline
+  \textbf{Control Method} & \textbf{Tracking Error} & \textbf{Control Effort} \\
+  \hline
+  FB & 101.3295 & 509.1809 \\
+  FF & 0 & -635.3090 \\
+  FB + FF & 34.8750 & -392.8959 \\
+  \hline
+  \end{tabular}
+  \caption{Performance Comparison of Control Methods}
+  \label{tab:control_comparison}
+  \end{table}
+
+  To conclude, the feedforward + feedback control is the most chill with a an impressive control effort. The purely feedforward control has achieved perfect control, but too high negative control effort, means that there is more effort in the opposite way we are pushing mass 1. So I would say that the feedback + feedforward control is the best, considering it has the smallest magnitude of all control efforts, as well as a reasonably low tracking error. Ultimately, it depends on your priorities.
+
+  
+  \end{solution}
+
   \part Using the feedback + feedforward controller in the previous part, modify the system slightly before simulation (for example, modify $M_1$ and $M_2$ by $\pm 1\%$) in order to simulate uncertainty in the model parameters. Which setup has the best tracking performance (i.e., feedback, feedforward, feedback + feedforward)?
+
+  \begin{solution}
+  The combined feedback + feedforward controller demonstrates the best performance of all controllers under uncertainty in the mass we initially push, with negligible performance across all tested cases. The cases I tried was the following.
+  
+  \begin{enumerate}
+    \item \textbf{Nominal}: $M_1 = 10 \cdot 1$, $M_2 = 10 \cdot 1$
+    \item \textbf{$M_1 + 1\%$}: $M_1 = 10 \cdot 1.01$, $M_2 = 10 \cdot 1$
+    \item \textbf{$M_1 - 1\%$}: $M_1 = 10 \cdot 0.99$, $M_2 = 10 \cdot 1$
+    \item \textbf{$M_2 + 1\%$}: $M_1 = 10 \cdot 1$, $M_2 = 10 \cdot 1.01$
+    \item \textbf{$M_2 - 1\%$}: $M_1 = 10 \cdot 1$, $M_2 = 10 \cdot 0.99$
+    \item \textbf{Both $+1\%$}: $M_1 = 10 \cdot 1.01$, $M_2 = 10 \cdot 1.01$
+    \item \textbf{Both $-1\%$}: $M_1 = 10 \cdot 0.99$, $M_2 = 10 \cdot 0.99$
+  \end{enumerate}
+
+
+  Here is the solution after simulating with feedback + feedforward
+
+  \begin{center}
+    \includegraphics[width = 0.8\linewidth]{exc1i_FF_FB_A3.pdf}
+  \end{center}
+
+  here is the solution after simulating with purely feedback control. As you can see, the performance is still quite good. This makes sense, since the feedback control will regulate itself on the proper path with the gain matrix when we use LQR.
+
+  \begin{center}
+    \includegraphics[width = 0.8\linewidth]{exc1i_FB_A3.pdf}
+  \end{center}
+
+  But for Feedforward control, the performance seems to be horrible. This confirms that FF performs bad under uncertainty and noisy systems. This is likely due to the fact that it is solved backwards, and the control is then not consistent with two different simulations
+
+  \begin{center}
+    \includegraphics[width = 0.8\linewidth]{exc1i_FF_A3.pdf}
+  \end{center}
+
+  Even though feedback and feedforward + feedback looks awfully similar, you can see from this illustration of control effort between the two different controls, that they differ the most at the end of the time period
+
+  \begin{center}
+    \includegraphics[width = 0.8\linewidth]{exc1i_nominal_controlEffort.pdf}
+  \end{center}
+\end{solution}
 \end{parts}
+
+
+
 
 \question[20] 
 Estimate the resistance value starting from a series of repeated current and voltage measurements.
@@ -615,12 +734,40 @@ Two different voltmeters are used, producing two data sets: one with low noise a
 
     \begin{align*}
       V(\hat{R}_{LS}) &=  V \left( \frac{ \sum_{ t=1 }^{ 2N } i(t)u(t) }{ \sum_{ t=1 }^{ 2N } i(t)^2 } \right) \\
-      &= V \left( \sum_{ t=1 }^{ 2N } \frac{ i(t) \left( R_0i_0(t) + n_u(t) \right)  }{ i(t)^2 } \right)  \\
-      &= V \left( \sum_{ t=1 }^{ 2N } \frac{ i(t) R_0 + i(t)^2 n_u(t) }{ i(t)^2 } \right) \\
-      &= V(R_0) + \sum_{ t=1 }^{ 2N } \frac{ i(t)^2V(n_u(t) }{ i(t)^4 } \\
-      &= \frac{ 1 }{ \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 }{ w(t) } }
+      &= V \left( \sum_{ t=1 }^{ 2N } \frac{ i(t) \left( R_0i_0(t) + n_u(t) \right)  }{ i(t)^2 } \right) \\
+      &= V \left( \sum_{ t=1 }^{ 2N } \frac{ i(t)^2 R_0 }{ i(t)^2 } + \sum_{ t=1 }^{ 2N } \frac{ i(t) n_u(t) }{ i(t)^2 } \right) \\
+      &= V \left( R_0 + \sum_{ t=1 }^{ 2N } \frac{ i(t) n_u(t) }{ i(t)^2 } \right) \\
+      &=  \frac{ \sum_{ t=1 }^{ 2N } i(t)^2 V(n_u(t)}{ \left( \sum_{ t=1 }^{ 2N } i(t)^2 \right)^2  } \\
+      &= \frac{ \sum_{ t=1 }^{ 2N } i(t)^2 \sigma_u(t)^2 }{ \left( \sum_{ t=1 }^{ 2N } i(t)^2 \right)^2  }
     \end{align*}
-    from the same reasoning that $ V(n_u(t)= w(t) $ 
+    from the same reasoning that $ V(n_u(t))= w(t) $, and where 
+    \[ 
+        \sigma_u^2 = \begin{cases}
+          1, \text{ good voltimeter}\\
+          16, \text{ bad voltimeter}
+        \end{cases}
+    \]
+
+    Now we can compare the theoretical with the empirical variances. Using the variances derived above, with $ N = 100 $, and generating $ \hat{R} $, $ 1e5 $ times I get:
+
+    \begin{itemize}
+      \item \textbf{\textit{Experimental variance}}
+      \begin{itemize}
+        \item WLS variance: $ 300.9280 $
+        \item LS variance: $ 1.9484e+04 $  
+      \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+      \item \textbf{\textit{theoretical variance}}
+      \begin{itemize}
+        \item WLS variance: $ 265.9457 $
+        \item LS variance: $ 1.1347e+03 $  
+      \end{itemize}
+    \end{itemize}
+    
+
+    If we increase the number of experiments to $ 1e6 $, we will get more accurate results, where the experimental variance approaches the derived variance we found above. This is the law of large numbers coming in to play. 
     
   \end{solution}
 \end{parts}
@@ -745,7 +892,7 @@ For each input type, perform the following:
 Plot histograms for $\hat{a}$ and for $\hat{b}$ for the different input types on the same plot. Which input type yields the lowest variance estimate?
 
 \begin{solution}
-  Here is the histogram plots for the different a and b:
+  I assume that for $ u_k $, that you mean that u is an $ n \times 1 $ vector, with $ -1 $ about half the time, and the other half is 1. Here is the histogram plots for the different a and b:
 
   \begin{center}
     \includegraphics[width = 1\linewidth]{./figures/figure_exc_3b_A3.pdf}
@@ -787,7 +934,7 @@ Method 3 & 0.007848 & 0.002587 \\
 \end{tabular}
 \end{table}
 
-From this, we see that method 2 is without a doubt the worst. It is relatively close between method 1 and method 2 having the lowest variance implication on the coefficient estimates $ \hat{a} $ and $ \hat{b} $.
+From this, we see that method 2 is without a doubt the worst. It is relatively close between method 1 and method 3 having the lowest variance implication on the coefficient estimates $ \hat{a} $ and $ \hat{b} $.
 
 It comes to the point where it differs between each time I run the code. 
 
@@ -801,7 +948,7 @@ It comes to the point where it differs between each time I run the code.
     \end{solution} 
   \item What happens if the input \(u_k\) is constant?
   \begin{solution}
-      If one of the controls are constant, I dont see any much affection on the series y. But if $ u_k=0 \forall k $ then the matrix $ \Phi^T \Phi $ is non-invertible. I mentioned this earlier. In this case, the estimates $ \hat{a} $ and $ \hat{b} $ are all zero. This is because the equation
+      If one of the controls are constant, I dont see any much affection on the series y. The only thing I see happening is that the matrix $ \Phi $ has two columns that are nearly linearly dependent vectors, which means that they become ill-conditioned, which may result in higher variance. But if $ u_k=0 \forall k $ then the matrix $ \Phi^T \Phi $ is non-invertible. I mentioned this earlier. In this case, the estimates $ \hat{a} $ and $ \hat{b} $ are all zero. This is because the equation
 
       \[
           \hat{\theta} = \left( \Phi^T \Phi \right) ^{-1} \Phi^T y
@@ -810,9 +957,9 @@ It comes to the point where it differs between each time I run the code.
       would not exist, due non-invertible property of the $ \Phi^T \Phi $ matrix
       
   \end{solution}
-  \item How would correlated noise \(e_k\) affect the bias of the estimates?
+  \item How would correlated noise \(e_k\) affect the bias of the estimates? 
   \begin{solution}
-    FDGDS
+    The linear model introduces bias to the estimates, and it will violate the assumptions of linear regression. This assumption is that $ e_k  $ is white noise, which is uncorrelated with the data. This will ultimately lead to wrong biased estimates 
   \end{solution}
 \end{enumerate}
 

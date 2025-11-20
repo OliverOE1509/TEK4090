@@ -71,7 +71,6 @@ function R_hat_LS = generate_Rhat_LS(N, R0, sigma_good, sigma_bad)
     R_hat_LS = numerator / denominator;
 end
 
-disp(R0)
 
 
 R_WLS = zeros(1e5, 1);
@@ -81,6 +80,12 @@ for i = 1:1e5
     R_LS(i) = generate_Rhat_LS(N, R0, sigma_good_voltmeter, sigma_bad_voltmeter);
 end
 
+
+disp(var(R_WLS))
+disp(var(R_LS))
+
+
+return
 figure;
 h1 = histogram(R_WLS, 'FaceAlpha', 0.5, 'DisplayName', 'WLS');
 hold on;

@@ -28,7 +28,7 @@ zeros = tzero(sys);
 
 disp(zeros)
 
-T = 10;
+T = 100;
 w = 2 * pi / T;
 A_a = w / T;
 t = 0:0.01:T;
@@ -71,6 +71,7 @@ fprintf('U control effort')
 disp(inte_U)
 fprintf('Y error sum ')
 disp(inte_y_error)
+
 
 
 

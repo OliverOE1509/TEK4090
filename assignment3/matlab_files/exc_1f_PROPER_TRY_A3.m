@@ -3,12 +3,13 @@ B = [0; 0; 12/143; -1/143];
 C = [0 1 0 0];
 D = 0;
 
-
-w = 2 * pi / T;
-AA = w / T;
-yddot_des = AA * sin(w * t);
-ydot_des = (AA/w) * (1 - cos(w * t));
-y_des = -(AA/(w^2)) * sin(w*t) + (AA/w) * t;
+Tt = 10;
+t = 0:0.01:Tt;
+w = 2 * pi / Tt;
+AA = w / Tt;
+ydd_dot = AA * sin(w * t);
+yd_dot = (AA/w) * (1 - cos(w * t));
+y_d = -(AA/(w^2)) * sin(w*t) + (AA/w) * t;
 
 A_y = C * A^2;
 B_y = C * A * B;
@@ -20,7 +21,6 @@ T_eta = [1 0 0 0; 0 0 1 0];
 
 
 T = [T_zeta ; T_eta];
-disp(size(T))
 T_inv = inv(T);
 Tl_inv = T_inv(:, 1:2);
 Tr_inv = T_inv(:, 3:4);
@@ -30,7 +30,6 @@ B_inv1 = T_eta * (A - B*inv(B_y)*A_y) * Tl_inv;
 B_inv2 = T_eta * B * inv(B_y);
 B_inv = [B_inv1, B_inv2];
 
-disp(size(A_inv))
 
 function eta_ref = solve_internal_dynamics(A_inv, B_inv, y_d, yd_dot, yd_ddot, t)
     % Split A_inv into stable and unstable parts
@@ -95,5 +94,141 @@ for k = 1:length(t)
 end
 
 for k = 1:length(t)
-    u_inv(k) = inv(B_y) * (yd_ddot(k) - A_y * x_ref(:,k));
+    u_inv(k) = inv(B_y) * (ydd_dot(k) - A_y * x_ref(:,k));
 end
+
+
+
+
+
+figure('Position', [100, 100, 1200, 800]);
+
+% Plot 1: Desired trajectory
+% subplot(3, 2, 1);
+% plot(t, y_d, 'b', 'LineWidth', 2); hold on;
+% plot(t, yd_dot, 'r', 'LineWidth', 2);
+% plot(t, ydd_dot, 'g', 'LineWidth', 2);
+% title('Desired Output Trajectory');
+% xlabel('Time (s)');
+% ylabel('Amplitude');
+% legend('Position y_d', 'Velocity \dot{y}_d', 'Acceleration \ddot{y}_d', 'Location', 'best');
+% grid on;
+
+tracking_error = y_d - x_ref(2,:);
+fprintf('Integral of y error')
+disp(trapz(tracking_error))
+fprintf('integral of control')
+disp(trapz(u_inv))
+
+
+figure;
+subplot(3, 1, 1);
+plot(t, y_d, 'b--', 'LineWidth', 2); hold on;
+plot(t, x_ref(2,:), 'r-', 'LineWidth', 1);
+xlabel('Time (s)');
+ylabel('Position');
+legend('Desired y_d', 'Reference x_{2,ref}', 'Location', 'best');
+grid on;
+
+subplot(3, 1, 2)
+plot(t, u_inv);
+xlabel('Time (s)')
+ylabel('u_inv(t)')
+legend('control u')
+grid on;
+
+subplot(3, 1, 3)
+plot(t, tracking_error);
+ylabel('tracking error')
+grid on;
+return
+% Plot 2: Internal states eta
+% subplot(3, 3, 2);
+% plot(t, eta_ref(1,:), 'b', 'LineWidth', 2); hold on;
+% plot(t, eta_ref(2,:), 'r', 'LineWidth', 2);
+% title('Internal States \eta_{ref}');
+% xlabel('Time (s)');
+% ylabel('Amplitude');
+% legend('\eta_1', '\eta_2', 'Location', 'best');
+% grid on;
+
+% Plot 3: Inverse input
+subplot(3, 2, 2);
+plot(t, u_inv, 'm', 'LineWidth', 2);
+title('Inverse Input u_{inv}');
+xlabel('Time (s)');
+ylabel('Force');
+grid on;
+
+% Plot 4: Reference states
+% subplot(3, 2, 2);
+% plot(t, x_ref(1,:), 'b', 'LineWidth', 2); hold on;
+% plot(t, x_ref(2,:), 'r', 'LineWidth', 2);
+% title('Reference States: Positions');
+% xlabel('Time (s)');
+% ylabel('Position');
+% legend('x_{1,ref}', 'x_{2,ref}', 'Location', 'best');
+% grid on;
+
+% Plot 5: Reference velocities
+% subplot(3, 3, 4);
+% plot(t, x_ref(3,:), 'b', 'LineWidth', 2); hold on;
+% plot(t, x_ref(4,:), 'r', 'LineWidth', 2);
+% title('Reference States: Velocities');
+% xlabel('Time (s)');
+% ylabel('Velocity');
+% legend('\dot{x}_{1,ref}', '\dot{x}_{2,ref}', 'Location', 'best');
+% grid on;
+
+% Plot 7: Compare desired vs reference output
+subplot(3, 2, 5);
+plot(t, y_d, 'b--', 'LineWidth', 2); hold on;
+plot(t, x_ref(2,:), 'r-', 'LineWidth', 1);
+title('Output Comparison');
+xlabel('Time (s)');
+ylabel('Position');
+legend('Desired y_d', 'Reference x_{2,ref}', 'Location', 'best');
+grid on;
+
+% % Plot 8: Control effort components
+% subplot(3, 3, 8);
+% % Break down u_inv components for analysis
+% u_components = zeros(3, length(t));
+% for k = 1:length(t)
+%     zeta_d = [y_d(k); yd_dot(k)];
+%     u_components(1,k) = inv(B_y) * ydd_dot(k);
+%     u_components(2,k) = -inv(B_y) * A_y * Tl_inv * zeta_d;
+%     u_components(3,k) = -inv(B_y) * A_y * Tr_inv * eta_ref(:,k);
+% end
+% plot(t, u_components(1,:), 'g', 'LineWidth', 1); hold on;
+% plot(t, u_components(2,:), 'b', 'LineWidth', 1);
+% plot(t, u_components(3,:), 'r', 'LineWidth', 1);
+% plot(t, u_inv, 'k--', 'LineWidth', 2);
+% title('Control Effort Components');
+% xlabel('Time (s)');
+% ylabel('Force');
+% legend('Accel term', 'State term', 'Internal term', 'Total u_{inv}', 'Location', 'best');
+% grid on;
+
+% Plot 9: Noncausal behavior indicator
+% subplot(3, 3, 9);
+% [V, D] = eig(A_inv);
+% eigenvalues = diag(D);
+% stable_idx = real(eigenvalues) < 0;
+% unstable_idx = real(eigenvalues) > 0;
+% 
+% % Show which modes are solved forward/backward
+% if any(unstable_idx)
+%     plot(t, ones(size(t)), 'r-', 'LineWidth', 3); hold on;
+%     text(mean(t), 1.1, 'UNSTABLE: Solved BACKWARD', 'HorizontalAlignment', 'center', 'Color', 'r');
+% end
+% if any(stable_idx)
+%     plot(t, zeros(size(t)), 'g-', 'LineWidth', 3);
+%     text(mean(t), -0.1, 'STABLE: Solved FORWARD', 'HorizontalAlignment', 'center', 'Color', 'g');
+% end
+% ylim([-0.5, 1.5]);
+% title('Solution Direction');
+% xlabel('Time (s)');
+% yticks([]);
+
+sgtitle('Feedforward Control Analysis for Nonminimum-Phase System');

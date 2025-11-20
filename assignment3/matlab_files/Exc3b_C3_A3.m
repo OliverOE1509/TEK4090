@@ -1,7 +1,8 @@
 N = 100;
 a = 0.2;
 b = -0.25;
-eps = normrnd(0, 0.5, N, 1);
+eps = randn(N, 1);
+eps = 0.5 * eps;
 
 function u = generate_random_u_of_1(N)
     u = randn(N, 1);

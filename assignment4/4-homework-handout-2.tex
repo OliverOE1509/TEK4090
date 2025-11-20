@@ -1,0 +1,75 @@
+\documentclass[12pt,A4, onecolumn]{exam}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[lmargin=71pt, tmargin=1.2in]{geometry}  %For centering solution box
+\lhead{TEK4090 -- Introduction to Modern Control\\}
+\rhead{Assignment 3\\}
+% \chead{\hline} % Un-comment to draw line below header
+\thispagestyle{empty}   %For removing header/footer from page 1
+
+\usepackage{graphicx}
+\graphicspath{{./figures}}
+
+\def\showsoln{1}
+
+\begin{document}
+
+\begingroup  
+    \centering
+    \LARGE TEK4090 -- Introduction to Modern Control\\
+    \LARGE Assignment 4 v1.0[0.5em]\\
+    \LARGE Parts 2 + 3\\
+    \large Due: December 5 2025, 23:30\\
+\endgroup
+\rule{\textwidth}{0.4pt}
+%\pointsdroppedatright   %Self-explanatory
+\printanswers
+
+
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}   %Replace "Ans:" with starting keyword in solution box
+
+\begin{questions}
+
+\addtocounter{question}{1}
+
+
+\question[30] In this problem, you will investigate some properties and quirks of data-enabled predictive control (DeePC).
+
+\begin{parts}
+  \part Inspect the code. What kind of system is being simulated? What are the parameters (prediction horizon, $T_{\text{ini}}$, etc.)? What are the constraints on the system?
+
+  \part Run the code, and describe the results.
+
+  \part You may or may not receive the warning: `Warning: Your Hessian is not symmetric. Resetting H=(H+H')/2. $>$ In quadprog (line xyz)'. Regardless, is this warning true? Why or why not?
+
+  \part Notice the commented-out measurement noise in the offline data collection. What happens if you uncomment the noise? Try noises of different magnitudes. What happens to the behaviour? What happens if you change the penalty on the slack variables, and why?
+
+  \part The code currently has a constant reference. Modify the code to track the desired trajectory in line 81 (or thereabouts). Try a noise-free offline data collection. How much noise can you add to the offline data before the tracking performance degrades significantly? (Hint: you can either implement the same slack variable method as in Part 1 since the reference goes outside the bounds, or if you don't have time, just change the magnitude of the reference so its inside the bounds)
+\end{parts}
+
+\begin{solution}
+  \begin{parts}
+    \part 
+  \end{parts}
+\end{solution}
+
+\newpage 
+
+ \question[10] 
+
+Suppose that $(A,B,C)$ represents a stable, observable system. Show that
+\begin{align}
+  AW_c + W_cA^T = - BB^T,
+\end{align}
+where
+\begin{align}
+  W_c = \int_0^\infty \exp(At) BB^T \exp(A^Tt)dt,
+\end{align}
+without using the method on the Wikipedia page on the controlability Gramian. (Hint: watch the lecture, and/or read the annotated notes).
+
+\end{questions}
+
+
+
+
+\end{document}
