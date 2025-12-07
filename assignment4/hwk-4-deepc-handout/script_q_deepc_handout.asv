@@ -32,8 +32,8 @@ for k = 1:T_data
     y_data(:,k) = C*z + D*u_data(:,k) + 0.000001*randn([ny,1]);
     z = A*z + B*u_data(:,k);
 end
-disp(y_data)
-return
+
+
 
 %% DeePC parameters
 T_ini = 10;                                 % length of "initial" window

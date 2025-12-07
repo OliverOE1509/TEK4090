@@ -8,7 +8,22 @@
 \thispagestyle{empty}   %For removing header/footer from page 1
 
 \usepackage{graphicx}
+\usepackage{caption}
+
+\usepackage{xcolor}
+\usepackage{listings}
 \graphicspath{{./figures}}
+
+
+% MATLAB style
+\lstdefinestyle{matlabstyle}{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green},
+    numbers=left,
+    frame=single
+}
 
 \def\showsoln{1}
 
@@ -49,7 +64,49 @@
 
 \begin{solution}
   \begin{parts}
-    \part 
+    \part The system that seems to be modelled is a 2D coupled mass spring damper system, like we encountered in exercise 1 in assignment 3. In Data enabled predictive control (DeePC), we seem to be building Hankel matrices, which has the property that each ascending skew diagonal from left to right is constant. So a $ n\times n $ hankel matrix is symmetric. The constraints seem to be on the out put y, where $ y \in \left[ - \frac{ 1 }{ 2 }, \frac{ 3 }{ 2 } \right]  $ and the input $ u \in \left[ -1, 1 \right]  $. The parameters seem to be what defines the Hankel matrices. We make the Hankel matrices from our inout u, and the generated y from our "truth model" that we assume is not known. We want to find the system dynamics, with only knowing the inputs and outputs. $ T_{ini} $ helps estimate what the current state of the system is, using past data. So the lines
+    \begin{lstlisting}[style = matlabstyle]
+      U_p = U_h(1:nu*T_ini, :) 
+      Y_p = Y_h(1:ny*T_ini, :)
+    \end{lstlisting}
+
+    is the first 10 input samples and output samples. What is the prediciton horizon? Thats how far we estimate into the future what our system will be. This is what we optimize with the MPC and QP
+
+
+    \begin{lstlisting}[style = matlabstyle]
+      U_f = U_h(nu*T_ini+1:end, :)
+      Y_f = Y_h(ny*T_ini+1:end, :)
+    \end{lstlisting}
+
+    Now we have that $ L = T_{ini} + n_{pred} = 30$ is the total window length of the hankel matrices. 
+
+
+    \part When I run the code, I get this figure:
+    \begin{center}
+      \includegraphics[width = 1\linewidth]{deepc_1b.pdf}
+      \captionof{figure}{plot of DeePC control simulation}
+      \label{fig:DeePC_control}
+    \end{center}
+
+    I mentioned earlier that we are modelling a 2d spring mass damping system, where we have two masses, where pushing mass 1, affects pushing mass 2. The inputs are the forces applied to the masses. We see that both forces start out at max force, while u1 takes off and changes sign to negative force (this means pulling if pushing is equivalent to positive force applied), and u2 follows after. with more overshooting in the control trajectory. But it converges towards zero. u1 converges to $ -0.5 $ which means we have to apply a constant force to keep mass 1 in position 1.   
+
+    \part I do get the warning described in the exercise, but it doesnt mean anything for my plot it seems. Here is the plot that happened after I made this line 
+    \begin{lstlisting}[style = matlabstyle]
+      H = (H + H')/2
+    \end{lstlisting}
+    
+    before I called \begin{verbatim} quadprog \end{verbatim}
+    \begin{center}
+      \includegraphics[width = 1\linewidth]{hessian_error_c.pdf}
+      \captionof{figure}{Plot after $ H = (H + H')/2 $ }
+      \label{fig:hessian_error}
+    \end{center}
+
+    And this very much resembles the plot of Figure~\ref{fig:DeePC_control} which indicates that the warning has nothing to say for our simulation. The line added, also removes all the warnings.
+
+    \part
+
+
   \end{parts}
 \end{solution}
 
