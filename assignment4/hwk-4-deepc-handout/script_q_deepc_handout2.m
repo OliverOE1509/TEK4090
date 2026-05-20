@@ -80,13 +80,13 @@ y_cl = zeros(ny, n_sim);
 % reference output: step for both outputs
 y_ref_step = [1; 1];                            % desired step
 yd = 10*cos(2*pi*t_space/50);                   % desired trajectory
-%y_ref_vec  = repmat(y_ref_step, n_pred, 1);     % constant trajectory
-y_ref_vec = zeros(ny*n_pred, 1);
-for k = 1:n_pred
-    % Scale cosine to fit within [-0.5, 1.5] bounds
-    scaled_cos = 0.5 + cos(2*pi*(k)/50);  % Shifts from [-1,1] to [0,2], then scale
-    y_ref_vec((k-1)*ny+1:k*ny) = scaled_cos * [0.75; 0.75];  % Further scale to [0,1.5]
-end
+y_ref_vec  = repmat(y_ref_step, n_pred, 1);     % constant trajectory
+%y_ref_vec = zeros(ny*n_pred, 1);
+%for k = 1:n_pred
+%    % Scale cosine to fit within [-0.5, 1.5] bounds
+%    scaled_cos = 0.5 + cos(2*pi*(k)/50);  % Shifts from [-1,1] to [0,2], then scale
+%   y_ref_vec((k-1)*ny+1:k*ny) = scaled_cos * [0.75; 0.75];  % Further scale to [0,1.5]
+%end
 
 % warm-up history (T_ini samples) with zero input
 u_hist = zeros(nu, T_ini);
@@ -135,7 +135,22 @@ b_ineq = [b_u;
           b_y;
           b_s];
 
+y_ref_full = zeros(ny, n_sim);
 for k = 1:n_sim
+    ct = t_space(k);
+    cosVal = cos(2*pi*ct/50);
+    scaled_value = 0.5 + 0.5*cosVal;
+    y_ref_full(:, k) = scaled_value * [1; 1];
+end
+
+for k = 1:n_sim
+    y_ref_vec = zeros(ny*n_pred, 1);    
+    for idx = 1:n_pred
+        ref_idx = min(k + idx - 1, n_sim);        
+        y_ref_vec((idx-1)*ny+1:idx*ny) = y_ref_full(:, ref_idx);
+    end
+    f_base = -2*( Y_f' * Qbar * y_ref_vec );
+    f = [f_base; zeros(n_s,1)];
 
     % Build u_ini and y_ini from history (stacked columns)
     u_ini = reshape(u_hist, nu*T_ini, 1);   % (nu*T_ini x 1)
@@ -181,23 +196,32 @@ end
 %% Plot results
 t = t_space(1:end-1);
 
+% Create the scaled cosine reference for plotting
+y_ref_plot = zeros(ny, n_sim);
+for k = 1:n_sim
+    current_time = t_space(k);
+    cos_value = cos(2*pi*current_time/50);
+    scaled_value = 0.5 + 0.5*cos_value;  % ∈ [0,1]
+    y_ref_plot(:, k) = scaled_value * [1; 1];
+end
+
 figure;
 subplot(3,1,1);
 plot(t, y_cl(1,:), 'LineWidth',1.5); hold on;
-yline(y_ref_step(1),'--');
+plot(t, y_ref_plot(1,:), 'r--', 'LineWidth',1.5);  % Plot cosine reference!
 yline(y_min(1),':'); yline(y_max(1),':');
 grid on;
 xlabel('k'); ylabel('y_1(k)');
-legend('y_1','ref_1','y_{1,min}','y_{1,max}');
-title('DeePC closed-loop outputs with constraints');
+legend('y_1','ref_1 (cosine)','y_{1,min}','y_{1,max}');
+title('DeePC closed-loop outputs with constraints - Cosine tracking');
 
 subplot(3,1,2);
 plot(t, y_cl(2,:), 'LineWidth',1.5); hold on;
-yline(y_ref_step(2),'--');
+plot(t, y_ref_plot(2,:), 'r--', 'LineWidth',1.5);  % Plot cosine reference!
 yline(y_min(2),':'); yline(y_max(2),':');
 grid on;
 xlabel('k'); ylabel('y_2(k)');
-legend('y_2','ref_2','y_{2,min}','y_{2,max}');
+legend('y_2','ref_2 (cosine)','y_{2,min}','y_{2,max}');
 
 subplot(3,1,3);
 plot(t, u_cl(1,:), 'LineWidth',1.5); hold on;
@@ -208,4 +232,4 @@ xlabel('k'); ylabel('u_i(k)');
 legend('u_1','u_2','u_{min}','u_{max}');
 title('Control inputs');
 
-sgtitle('Low Error, eps = 0.01, lambda_s = 1e2, lambda_g = 1e-1');
+sgtitle('Cosine tracking with noise ε = 0.000001, λ_s = 1e4, λ_g = 1e-4');
